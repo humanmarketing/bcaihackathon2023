@@ -32,11 +32,12 @@ export const createAppExtension = async ({
     }
   );
 
-  const { errors } = await response.json();
+  const { data, errors } = await response.json();
 
   if (errors && errors.length > 0) {
     throw new Error(errors[0]?.message);
   }
+  console.log(data);
 };
 
 export const getAppExtensions = async ({
@@ -61,6 +62,10 @@ export const getAppExtensions = async ({
       store: { appExtensions },
     },
   }: AppExtensionResponse = await response.json();
+
+
+  
+  console.log(appExtensions);
 
   return appExtensions.edges;
 };
@@ -104,14 +109,18 @@ const createAppExtensionMutation = () => ({
   variables: {
     input: {
       context: 'PANEL',
-      model: 'PRODUCT_DESCRIPTION',
-      url: '/productDescription/${id}',
+      model: 'CUSTOMERS',
+      url: '/customer/${id}',
       label: {
-        defaultValue: 'Generate text',
+        defaultValue: 'Customer Stats & Promotions',
         locales: [
           {
-            value: 'Generate text',
+            value: 'Customer Stats & Promotions',
             localeCode: 'en-US',
+          },
+          {
+            value: 'Estadísticas y promociones de clientes',
+            localeCode: 'es-419',
           },
         ],
       },

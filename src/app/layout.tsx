@@ -1,5 +1,6 @@
 import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
+import Header from '~/components/Header';
 import StyledComponentsRegistry from '~/lib/registry';
 import ThemeProvider from './theme-provider';
 
@@ -8,7 +9,7 @@ const sourceSans = Source_Sans_3({
   weight: ['300', '400', '600', '700', '800'],
 });
 
-export const metadata: Metadata = { title: 'Product description generator' };
+export const metadata: Metadata = { title: 'Ecommerce Copilot AI' };
 
 export default function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body>
         <StyledComponentsRegistry>
           <ThemeProvider>
+            <Header minHeight="150px" />
             <main className={sourceSans.className}>{children}</main>
           </ThemeProvider>
         </StyledComponentsRegistry>

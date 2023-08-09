@@ -26,6 +26,19 @@ const brandSchema = z.object({
   data: z.object({ name: z.string().optional() }),
 });
 
+const customerSchema = z.object({
+  data: z.array(z.object({
+    email: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    company: z.string(),
+    phone: z.string(),
+    notes: z.string(),
+    customer_group_id: z.number(),
+    // attributes: z.array(z.object({ attribute_id: z.number(), attribute_value: z.string() })),
+  })),
+});
+
 const fetchFromBigCommerceApi = (
   path: string,
   accessToken: string,
@@ -123,4 +136,36 @@ export async function fetchBrand(
   }
 
   return parsedBrand.data.data.name;
+}
+
+export async function fetchCustomers(
+  customers: number[],
+  accessToken: string,
+  storeHash: string
+) {
+  const params = new URLSearchParams({
+    'id:in': customers.join(','),
+  }).toString();
+  const response = await fetchFromBigCommerceApi(
+    `/customers?${params}`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch customers');
+  }
+
+
+  const parsedCustomers = customerSchema.safeParse(await response.json());
+  // const results = await response.json();
+  // console.log(results);
+  // const parsedCustomers = customerSchema.safeParse(results);
+
+
+  if (!parsedCustomers.success) {
+    throw new Error('Failed to parse customers');
+  }
+
+  return parsedCustomers.data.data;
 }

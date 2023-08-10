@@ -6,6 +6,7 @@ import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Switch, Table, Text } from '@bigcommerce/big-design';
 import { EditIcon } from '@bigcommerce/big-design-icons';
+import StatusSwitch from '~/components/StatusSwitch';
 
 const Hr = styled(Flex)`
   margin-left: -${({ theme }) => theme.spacing.xLarge};
@@ -72,7 +73,7 @@ export default function Promotions() {
               <Table
                   columns={[
                     { header: 'Target', hash: 'target', render: ({ target }) => target },
-                    { header: 'Status', hash: 'status', render: ({ target, status }) => <WidgetSwitch name={target} status={status} /> },
+                    { header: 'Status', hash: 'status', render: ({ target, status }) => <StatusSwitch name={target} status={status} /> },
 
                   ]}
                   items={[
@@ -88,7 +89,7 @@ export default function Promotions() {
                 <Table
                   columns={[
                     { header: 'Promotion', hash: 'promotion', render: ({ promotion }) => promotion },
-                    { header: 'Status', hash: 'status', render: ({ promotion, status }) => <WidgetSwitch name={promotion} status={status} /> },
+                    { header: 'Status', hash: 'status', render: ({ promotion, status }) => <StatusSwitch name={promotion} status={status} /> },
                     { header: '', hash: 'action', render: ({ id }) => <Text><EditIcon size='medium' color='' /> Edit</Text> }
 
                   ]}
@@ -100,9 +101,7 @@ export default function Promotions() {
                     { id: 5, status: false, promotion: 'Free Gift with Purchase' },
                   ]}
                 />
-
             </Panel>
-
 
           </>
         </Box>
@@ -114,22 +113,22 @@ export default function Promotions() {
   );
 }
  
-function WidgetSwitch({ name, status}) {
-  const [checked, setChecked] = useState(status);
+// function StatusSwitch({ name, status}) {
+//   const [checked, setChecked] = useState(status);
 
 
-  const handleChange = async () => {
-      const newState = !checked;
-      setChecked(newState);
+//   const handleChange = async () => {
+//       const newState = !checked;
+//       setChecked(newState);
 
-  }
+//   }
   
 
-  return <Switch name={name} checked={checked} onChange={handleChange} />;
-}
+//   return <Switch name={name} checked={checked} onChange={handleChange} />;
+// }
 
 
-// function WidgetSwitch({hash, name, widgetId, status, uuid, encodedContext}) {
+// function StatusSwitch({hash, name, widgetId, status, uuid, encodedContext}) {
 //   const [checked, setChecked] = useState(status);
 //   const [widgetUuid, setWidgetUuid] = useState(uuid);
 //   const [widgetHash, setWidgetHash] = useState(hash);

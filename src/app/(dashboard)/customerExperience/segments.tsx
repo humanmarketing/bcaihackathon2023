@@ -12,6 +12,7 @@ import { EditIcon } from '@bigcommerce/big-design-icons';
 // import { StyledButton } from '~/components/PromptForm/styled';
 // import { prepareAiPromptAttributes } from '~/utils/utils';
 // import Loader from '~/components/Loader';
+import StatusSwitch from '~/components/StatusSwitch';
 
 const Hr = styled(Flex)`
   margin-left: -${({ theme }) => theme.spacing.xLarge};
@@ -75,16 +76,27 @@ export default function Segments() {
                 <Table
                   columns={[
                     { header: 'Segment', hash: 'segment', render: ({ segment }) => segment },
+                    { header: 'Status', hash: 'status', render: ({ promotion, status }) => <StatusSwitch name={promotion} status={status} /> },
                     { header: 'Goal', hash: 'goal', render: ({ goal }) => goal },
                     { header: 'Promotion', hash: 'Promotion', render: ({ promotion }) => promotion },
                     { header: '', hash: 'action', render: ({ id }) => <Text><EditIcon size='medium' color='' /> Edit {id}</Text> }
 
                   ]}
                   items={[
-                    { id: 1, segment: 'Frequent Purchasers', goal: 'Reduce friction; maintain margins', promotion: 'Free Shipping' },
-                    { id: 2, segment: 'Dormant Loyal Customers', goal: 'Restart purchase pattern', promotion: '20% Off Sitewide' },
-                    { id: 3, segment: 'New Customers', goal: 'Expand catelog exposure', promotion: '50% Off Socks Category' },
-                    { id: 4, segment: 'One-Time Purchasers', goal: 'Re-engage', promotion: '15% Off Next Purchase' },
+                    { id: 1, segment: 'Top Customers', status: true, goal: 'Reduce friction; maintain margins', promotion: 'Free Shipping' },
+                    { id: 2, segment: 'Loyal Customers', status: true, goal: 'Restart purchase pattern', promotion: '20% Off Sitewide' },
+                    { id: 3, segment: 'High Potentials', status: true, goal: 'Expand catelog exposure', promotion: '50% Off Socks Category' },
+                    { id: 4, segment: 'Small Buyers', status: true, goal: 'Re-engage', promotion: '15% Off Next Purchase' },
+                    { id: 5, segment: 'Dormant Customers', status: true, goal: 'Re-engage', promotion: '15% Off Next Purchase' },
+                    { id: 6, segment: 'Worst Customers', status: false, goal: 'Re-engage', promotion: '15% Off Next Purchase' },
+                    { id: 7, segment: 'Other', status: false, goal: 'Re-engage', promotion: '15% Off Next Purchase' },
+                    { id: 8, segment: 'Geography', status: false, goal: 'Regional growth', promotion: '15% Off Next Purchase' },
+
+
+                    // { id: 1, segment: 'Frequent Purchasers', goal: 'Reduce friction; maintain margins', promotion: 'Free Shipping' },
+                    // { id: 2, segment: 'Dormant Loyal Customers', goal: 'Restart purchase pattern', promotion: '20% Off Sitewide' },
+                    // { id: 3, segment: 'New Customers', goal: 'Expand catelog exposure', promotion: '50% Off Socks Category' },
+                    // { id: 4, segment: 'One-Time Purchasers', goal: 'Re-engage', promotion: '15% Off Next Purchase' },
                   ]}
                 />
 

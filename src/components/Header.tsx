@@ -5,7 +5,13 @@ import Image from 'next/image';
 
 export default function Header({ minHeight = '50vh' }) {
   return (
-    <Flex justifyContent="flex-start" alignItems="center" flexGap='4rem' style={{ minHeight }}>
+    <Flex 
+      justifyContent="flex-start" 
+      alignItems="center" flexGap='4rem' 
+      marginHorizontal={{ mobile: 'none', tablet: 'xLarge' }}
+      marginVertical={{ mobile: 'none', tablet: 'xSmall' }} 
+      style={{ minHeight }}
+      >
       <FlexItem>
         <Link href="/">
           <Image

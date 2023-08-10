@@ -1,6 +1,7 @@
 'use client';
 import {  useState } from 'react';
 import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Tabs, Text } from '@bigcommerce/big-design';
+import ProductPairings from './productPairings';
 import Promotions from './promotions';
 import Segments from './segments';
 
@@ -18,17 +19,17 @@ export default function CustomerExperienceContent() {
         marginHorizontal={{ mobile: 'none', tablet: 'xxxLarge' }}
         marginVertical={{ mobile: 'none', tablet: 'medium' }}
       >
-            <Tabs 
+          <Tabs 
             activeTab={activeTab}
             id="cx-tabs"
             items={tabs}
             onTabClick={(setActiveTab)}
-            />
-            <Box marginTop="medium">
+          />
+          <Box marginTop="medium">
             {activeTab === 'tab-1' && <Segments />}
             {activeTab === 'tab-2' && <Promotions />}
-            {activeTab === 'tab-3' && <Segments />}
-            </Box>
+            {activeTab === 'tab-3' && <ProductPairings />}
+          </Box>
       </Box>
     );
 }

@@ -14,18 +14,21 @@ export default function CustomerExperienceContent() {
       ];
 
     return (
-        <>
+      <Box
+        marginHorizontal={{ mobile: 'none', tablet: 'xxxLarge' }}
+        marginVertical={{ mobile: 'none', tablet: 'medium' }}
+      >
             <Tabs 
             activeTab={activeTab}
             id="cx-tabs"
             items={tabs}
             onTabClick={(setActiveTab)}
             />
-            <Box marginTop="xxLarge">
+            <Box marginTop="medium">
             {activeTab === 'tab-1' && <Segments />}
             {activeTab === 'tab-2' && <Promotions />}
             {activeTab === 'tab-3' && <Segments />}
             </Box>
-      </>
+      </Box>
     );
 }

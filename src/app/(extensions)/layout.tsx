@@ -1,5 +1,6 @@
 import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
+import Header from '~/components/Header';
 import StyledComponentsRegistry from '~/lib/registry';
 import ThemeProvider from '~/app/theme-provider';
 

@@ -2,7 +2,7 @@ import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
 import Header from '~/components/Header';
 import StyledComponentsRegistry from '~/lib/registry';
-import ThemeProvider from './theme-provider';
+import ThemeProvider from '~/app/theme-provider';
 
 const sourceSans = Source_Sans_3({
   subsets: ['latin'],
@@ -24,7 +24,7 @@ export default function RootLayout({
       <body>
         <StyledComponentsRegistry>
           <ThemeProvider>
-            <Header minHeight="150px" />
+            <Header minHeight="100px" />
             <main className={sourceSans.className}>{children}</main>
           </ThemeProvider>
         </StyledComponentsRegistry>

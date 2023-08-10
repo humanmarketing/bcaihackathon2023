@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
-import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Text } from '@bigcommerce/big-design';
+import { Badge, Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Text } from '@bigcommerce/big-design';
 import { OpenInNewIcon } from '@bigcommerce/big-design-icons';
 // import AiResults from '~/components/AiResults/AiResults';
 // import { CustomPromptForm } from '~/components/PromptForm/CustomPromptForm';
@@ -83,8 +83,22 @@ export default function Stats({ customer }: { customer: Customer | null }) {
         {customer ? (
         <Box marginBottom="large">
           <>
-            <H3>{customer.first_name} {customer.last_name}</H3>
-            <Text color='secondary'>{customer.email}</Text>
+            <Flex
+              flexDirection="row"
+              justifyContent="space-between"
+              marginBottom="medium"
+            >
+              <FlexItem>
+                <H3 marginBottom="xxSmall">{customer.first_name} {customer.last_name}</H3>
+                <Text color='secondary'>{customer.email}</Text>
+              </FlexItem>
+              <FlexItem>
+                <Badge 
+                  label="Top Customer"
+                  variant="success"
+                  />
+              </FlexItem>
+            </Flex>
           </>
           <>
             <Panel
@@ -152,7 +166,7 @@ export default function Stats({ customer }: { customer: Customer | null }) {
               >
                 <Flex alignContent='stretch' flexDirection='column' flexGap='1rem'>
                   <FlexItem>
-                    <Text><Text as="span" bold>Customer Segment:</Text> Frequent Purchases</Text>
+                    <Text><Text as="span" bold>Customer Segment:</Text> Frequent Purchaser (200 Others)</Text>
                     <Text><Text as="span" bold>Segment Promotion:</Text> Free Shipping</Text>
                   </FlexItem>
                   <FlexItem>

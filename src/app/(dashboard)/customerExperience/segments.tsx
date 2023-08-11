@@ -19,7 +19,7 @@ const Hr = styled(Flex)`
   margin-right: -${({ theme }) => theme.spacing.xLarge};
 `;
 
-export default function Segments() {
+export default function Segments({ storeHash, config }) {
   // const { results, setResults, handleDescriptionChange } =
   //   useDescriptionsHistory(customer.id);
   // const [isPrompting, setIsPrompting] = useState(false);

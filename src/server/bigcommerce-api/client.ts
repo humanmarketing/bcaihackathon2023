@@ -39,6 +39,20 @@ const customerSchema = z.object({
   })),
 });
 
+const promotionSchema = z.object({
+  data: z.array(z.object({
+    id: z.number(),
+    redemption_type: z.string(),
+    name: z.string(),
+    rules: z.any(),
+    created_from: z.string(),
+    status: z.string(),
+    can_be_used_with_other_promotions: z.boolean(),
+    currency_code: z.string(),
+    notifications: z.array(z.object({ type: z.string(), content: z.string(), locations: z.array(z.string()) })),
+  })),
+});
+
 const fetchFromBigCommerceApi = (
   path: string,
   accessToken: string,
@@ -168,4 +182,31 @@ export async function fetchCustomers(
   }
 
   return parsedCustomers.data.data;
+}
+
+export async function fetchPromotions(
+  promotions: number[],
+  accessToken: string,
+  storeHash: string
+) {
+  const params = new URLSearchParams({
+    'id:in': promotions.join(','),
+  }).toString();
+  const response = await fetchFromBigCommerceApi(
+    `/promotions?${params}`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch promotions');
+  }
+
+  const parsedPromotions = promotionSchema.safeParse(await response.json());
+
+  if (!parsedPromotions.success) {
+    throw new Error('Failed to parse promotions');
+  }
+
+  return parsedPromotions.data.data;
 }

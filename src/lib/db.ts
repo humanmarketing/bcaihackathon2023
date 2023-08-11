@@ -106,3 +106,16 @@ export async function deleteStore(storeHash: string) {
   const ref = doc(db, 'store', storeHash);
   await deleteDoc(ref);
 }
+
+export async function setCxConfig(storeHash: string, data: any) {
+  const ref = doc(db, 'cxConfig', storeHash);
+
+  await setDoc(ref, data);
+}
+
+export async function getCxConfig(storeHash: string): Promise<any | null> {
+  if (!storeHash) return null;
+  const storeDoc = await getDoc(doc(db, 'cxConfig', storeHash));
+
+  return storeDoc.data();
+}

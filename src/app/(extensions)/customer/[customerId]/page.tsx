@@ -1,10 +1,8 @@
 import { Suspense } from 'react';
 import Loader from '~/components/Loader';
-import { fetchCustomerWithAttributes, fetchProductWithAttributes } from '~/server/bigcommerce-api';
-import generateDescription from '~/server/google-ai';
+import { fetchCustomerWithAttributes } from '~/server/bigcommerce-api';
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
-import Generator from './generator';
 import Stats from './customerStats';
 
 interface PageProps {

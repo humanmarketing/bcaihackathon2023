@@ -2,6 +2,7 @@
 
 // import { usePromptAttributes } from '~/context/PromptAttributesContext';
 import { useState } from 'react';
+import useSWR from 'swr';
 import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Switch, Table, Text } from '@bigcommerce/big-design';
@@ -13,7 +14,22 @@ const Hr = styled(Flex)`
   margin-right: -${({ theme }) => theme.spacing.xLarge};
 `;
 
-export default function Promotions() {
+export default function Promotions({ token, storeHash }) {
+  const fetcher = (url) => fetch(url).then((res) => res.json());
+  const params = new URLSearchParams({ storeHash, token }).toString();
+
+  const { data: dataCxConfig, isLoading: isLoadingCxConfig, error: errorCxConfig } = useSWR(`/api/getConfig?${params}`, fetcher);
+  console.log('data', dataCxConfig);
+
+  const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(`/api/getBcPromotions?${params}`, fetcher);
+  console.log(dataBcPromos.results);
+
+  if ( isLoadingCxConfig ) return <Text>Loading</Text>;
+  if ( errorCxConfig  ) return <Text>{errorCxConfig}</Text>;
+
+
+
+
   // const { results, setResults, handleDescriptionChange } =
   //   useDescriptionsHistory(customer.id);
   // const [isPrompting, setIsPrompting] = useState(false);
@@ -56,6 +72,13 @@ export default function Promotions() {
   // };
 
 
+  const promotions = dataBcPromos.results.map(item => {
+    return {
+      id: item.id,
+      status: item.status === "ENABLED", // Convert "ENABLED" to true, otherwise false
+      promotion: item.name // Assuming "name" is the promotion name
+    };
+  });
 
 
   return (
@@ -77,9 +100,9 @@ export default function Promotions() {
 
                   ]}
                   items={[
-                    { id: 1, target: 'Existing Customers', status: true },
-                    { id: 2, target: 'Guest & Non-Logged in Shoppers', status: false },
-                    { id: 3, target: 'Post-purchase', status: true },
+                    { id: 1, target: 'Existing Customers', status: dataCxConfig.results.targetExistingCustomers },
+                    { id: 2, target: 'Guest & Non-Logged in Shoppers', status: dataCxConfig.results.targetGuestShoppers },
+                    { id: 3, target: 'Post-purchase', status: dataCxConfig.results.targetPostPurchase },
                   ]}
                 />
             </Panel>
@@ -93,13 +116,7 @@ export default function Promotions() {
                     { header: '', hash: 'action', render: ({ id }) => <Text><EditIcon size='medium' color='' /> Edit</Text> }
 
                   ]}
-                  items={[
-                    { id: 1, status: true, promotion: 'Free Shipping' },
-                    { id: 2, status: true, promotion: '20% Off Sitewide' },
-                    { id: 3, status: true, promotion: '50% Off Socks Category' },
-                    { id: 4, status: true, promotion: '15% Off Next Purchase' },
-                    { id: 5, status: false, promotion: 'Free Gift with Purchase' },
-                  ]}
+                  items={promotions}
                 />
             </Panel>
 

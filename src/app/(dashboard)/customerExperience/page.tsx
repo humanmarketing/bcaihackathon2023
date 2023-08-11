@@ -15,8 +15,6 @@ interface PageProps {
 }
 
 export default async function Page(props: PageProps) {
-  
-
   const authorized = authorize();
 
   if (!authorized) {
@@ -29,14 +27,14 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
+  const config = await db.getCxConfig(authorized.storeHash);
 
-
+  console.log('config', config);
 
 
   return (
     <Suspense fallback={<Loader />}>
-      <CustomerExperienceContent />
-      {/* <Segments /> */}
+      <CustomerExperienceContent token={accessToken} storeHash={authorized.storeHash} config={config} />
     </Suspense>
   );
 }

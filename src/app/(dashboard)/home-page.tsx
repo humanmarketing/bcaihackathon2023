@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+
 import styled from 'styled-components';
+import useSWR from 'swr';
 import { Flex, FlexItem, Text, Textarea, Panel, Box, Input } from '@bigcommerce/big-design';
 import { ChevronRightIcon } from '@bigcommerce/big-design-icons';
 
@@ -13,6 +15,9 @@ interface PageProps {
 
 export default function HomePage() {
   const setup = true;
+
+  const storeHash = 'vdxg1jkwzi';
+
 
   return (
     <Box

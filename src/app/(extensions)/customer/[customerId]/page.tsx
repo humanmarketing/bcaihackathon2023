@@ -1,9 +1,12 @@
 import { Suspense } from 'react';
 import Loader from '~/components/Loader';
+import { env } from '~/env.mjs';
 import { fetchCustomerWithAttributes } from '~/server/bigcommerce-api';
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 import Stats from './customerStats';
+
+const HASURA_GRAPHQL_ADMIN_SECRET = env.HASURA_GRAPHQL_ADMIN_SECRET;
 
 interface PageProps {
   params: { customerId: string };
@@ -26,7 +29,9 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
+  // TODO: switch to use dynamic customer id
   const id = Number(customerId);
+  const detailsId = Number(91332);
 
   // cover case when customer is not found
   const customer =
@@ -34,10 +39,66 @@ export default async function Page(props: PageProps) {
       ? null
       : await fetchCustomerWithAttributes(id, accessToken, authorized.storeHash);
 
+  const customerDetails = await getCustomerInfo({ customerId: detailsId, secret: HASURA_GRAPHQL_ADMIN_SECRET });
+
+  console.log('customerDetails', customerDetails);
 
   return (
     <Suspense fallback={<Loader />}>
-      <Stats customer={customer} />
+      <Stats customer={customer} details={customerDetails.dbt_slarkin2_bigcommerce__customers[0]} />
     </Suspense>
   );
 }
+
+interface HasuraCustomerProps {
+  customerId: number;
+  secret: string;
+}
+
+const getCustomerInfo = async ({
+  customerId,
+  secret,
+}: HasuraCustomerProps) => {
+  const response = await fetch(
+    `https://crucial-hagfish-44.hasura.app/v1/graphql`,
+    {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-hasura-admin-secret': secret,
+      },
+      body: JSON.stringify(getCustomerDetails(customerId)),
+    }
+  );
+
+  const { data, errors } = await response.json();
+
+  if (errors && errors.length > 0) {
+    throw new Error(errors[0]?.message);
+  }
+  return data;
+};
+
+const getCustomerDetails = ( customerId: number ) => ({
+  query: `
+  query MyQuery($customerId: Int!) {
+    dbt_slarkin2_bigcommerce__customers(limit: 10, where: {customer_id: {_eq: $customerId}}) {
+      customer_id
+      first_order_date
+      first_order_total
+      most_recent_order_date
+      most_recent_order_total
+      number_of_discounted_orders
+      order_count
+      order_frequency_days
+      total_discounts_value
+      cltv
+      days_between_first_last_order
+      date_created
+    }
+  }`,
+  variables: {
+    customerId: customerId,
+  },
+});

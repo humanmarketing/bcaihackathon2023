@@ -17,6 +17,7 @@ export const env = createEnv({
     CLIENT_SECRET: z.string().min(3),
     JWT_KEY: z.string().min(3),
     GOOGLE_API_KEY: z.string().min(3),
+    HASURA_GRAPHQL_ADMIN_SECRET: z.string().min(3),
   },
 
   /**
@@ -43,6 +44,7 @@ export const env = createEnv({
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     JWT_KEY: process.env.JWT_KEY,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+    HASURA_GRAPHQL_ADMIN_SECRET: process.env.HASURA_GRAPHQL_ADMIN_SECRET,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

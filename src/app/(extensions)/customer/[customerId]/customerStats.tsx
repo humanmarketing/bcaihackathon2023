@@ -18,7 +18,23 @@ const Hr = styled(Flex)`
   margin-right: -${({ theme }) => theme.spacing.xLarge};
 `;
 
-export default function Stats({ customer }: { customer: Customer | null }) {
+interface CustomerDetails {
+  customer_id: string;
+  first_order_date: string;
+  first_order_total: string;
+  most_recent_order_date: string;
+  most_recent_order_total: string;
+  number_of_discounted_orders: string;
+  order_count: string;
+  order_frequency_days: string;
+  total_discounts_value: string;
+  cltv: string;
+  days_between_first_last_order: string;
+  date_created: string;
+}
+
+
+export default function Stats({ customer, details }: { customer: Customer | null, details: CustomerDetails }) {
   // const { results, setResults, handleDescriptionChange } =
   //   useDescriptionsHistory(customer.id);
   // const [isPrompting, setIsPrompting] = useState(false);
@@ -75,6 +91,11 @@ export default function Stats({ customer }: { customer: Customer | null }) {
       '*'
     );
 
+
+  const rfmSegment = performRFMSegmentation(details);
+  const mappedSegments = mapRFMSegmentToSegments(rfmSegment);
+
+
   const statBoxStyles = `flexGrow: 1, flexShrink: 1, flexBasis: 0, padding: 'xSmall'`;
 
   return (
@@ -93,10 +114,19 @@ export default function Stats({ customer }: { customer: Customer | null }) {
                 <Text color='secondary'>{customer.email}</Text>
               </FlexItem>
               <FlexItem>
-                <Badge 
-                  label="Top Customer"
-                  variant="success"
-                  />
+                <Flex
+                  flexDirection='column'
+                >
+                  <FlexItem>
+                    <Badge 
+                      label={mappedSegments.segment}
+                      variant="success"
+                    />
+                  </FlexItem>
+                  <FlexItem>
+                    <Text color='secondary'>RFM: {rfmSegment.recency} - {rfmSegment.frequency} - {rfmSegment.monetary}</Text>
+                  </FlexItem>
+                </Flex>
               </FlexItem>
             </Flex>
           </>
@@ -105,22 +135,22 @@ export default function Stats({ customer }: { customer: Customer | null }) {
               header='Customer Stats'
               >
                 <Flex alignContent='stretch' flexDirection='row' flexGap='1rem'>
-                  <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'> 
-                    <Box border='box' padding='xSmall'>
-                      <Text bold marginBottom='xSmall'>Lifetime Value (LTV):</Text>
-                      <H1 as="h4" marginTop='none' marginBottom='none'>$1,000</H1>
-                    </Box>
-                  </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Total Orders:</Text>
-                      <H1 as="h4" marginTop='none' marginBottom='none'>5</H1>
+                      <H1 as="h4" marginTop='none' marginBottom='none'>{details.order_count}</H1>
+                    </Box>
+                  </FlexItem>
+                  <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'> 
+                    <Box border='box' padding='xSmall'>
+                      <Text bold marginBottom='xSmall'>Lifetime Value (LTV):</Text>
+                      <H1 as="h4" marginTop='none' marginBottom='none'>${details.cltv}</H1>
                     </Box>
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Average Order Value (AOV):</Text>
-                      <H1 as="h4" marginTop='none' marginBottom='none'>$200</H1>
+                      <H1 as="h4" marginTop='none' marginBottom='none'>${getAov(parseFloat(details.cltv), parseFloat(details.order_count))}</H1>
                     </Box>
                   </FlexItem>
                 </Flex>
@@ -128,19 +158,19 @@ export default function Stats({ customer }: { customer: Customer | null }) {
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>First Order Date:</Text>
-                      <Text marginTop='none' marginBottom='none'>Jan 1, 2021</Text>
+                      <Text marginTop='none' marginBottom='none'>{formatDate(details.first_order_date)}</Text>
                     </Box>
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Last Order Date:</Text>
-                      <Text marginTop='none' marginBottom='none'>Aug 1, 2023</Text>
+                      <Text marginTop='none' marginBottom='none'>{formatDate(details.most_recent_order_date)}</Text>
                     </Box>
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Days Since Last Order:</Text>
-                      <Text marginTop='none' marginBottom='none'>9</Text>
+                      <Text marginTop='none' marginBottom='none'>{calculateDaysDifference(details.most_recent_order_date)}</Text>
                     </Box>
                   </FlexItem>
                 </Flex>
@@ -202,3 +232,125 @@ export default function Stats({ customer }: { customer: Customer | null }) {
   );
 }
  
+function getAov(ltv: number, order_count: number) {
+  if(order_count === 0) return 0;
+  
+  return (ltv / order_count).toFixed(2);
+}
+
+function formatDate(inputDate: string): string {
+  const date = new Date(inputDate);
+  const monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct",
+    "Nov", "Dec"
+  ];
+  
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+  
+  return `${monthNames[monthIndex]} ${day}, ${year}`;
+}
+
+function calculateDaysDifference(inputDate: string): number {
+  const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+  const inputDateTime = new Date(inputDate).getTime();
+  const currentDateTime = new Date().getTime();
+
+  const timeDifference = currentDateTime - inputDateTime;
+  const daysDifference = Math.floor(timeDifference / oneDayInMilliseconds);
+
+  return daysDifference;
+}
+
+function calculateRFMScore(value, quantiles) {
+  if (value <= quantiles[0]) {
+    return 1;
+  } else if (value <= quantiles[1]) {
+    return 2;
+  } else if (value <= quantiles[2]) {
+    return 3;
+  } else {
+    return 4;
+  }
+}
+
+function performRFMSegmentation(customer) {
+  // Calculate quantiles for Recency, Frequency, and Monetary Value
+  const recencyQuantiles = [0.25, 0.5, 0.75];
+  const frequencyQuantiles = [0.25, 0.5, 0.75];
+  const monetaryQuantiles = [0.25, 0.5, 0.75];
+  
+  // Calculate RFM scores for the provided customer
+  const recency = calculateRFMScore(customer.days_between_first_last_order, recencyQuantiles);
+  const frequency = calculateRFMScore(customer.order_count, frequencyQuantiles);
+  const monetary = calculateRFMScore(customer.most_recent_order_total, monetaryQuantiles);
+  
+  // Create and return the RFM segment for the customer
+  const segment = {
+    customer_id: customer.customer_id,
+    recency,
+    frequency,
+    monetary,
+  };
+  
+  return segment;
+}
+
+function mapRFMSegmentToSegments(rfm) {
+    let segment = '';
+    let goal = '';
+    let promotion = '';
+    let status = true; // Default to true for segments without specific status
+
+    // Map RFM segments to your defined segments and set goals and promotions
+
+    if (rfm.recency === 1 && rfm.frequency === 4 && rfm.monetary === 4) {
+      segment = 'Top Customers';
+      goal = 'Reduce friction; maintain margins';
+    } else if (rfm.recency === 2 && rfm.frequency === 3 && rfm.monetary === 3) {
+      segment = 'Loyal Customers';
+      goal = 'Restart purchase pattern';
+      promotion = '20% Off Sitewide';
+    } else if (rfm.recency === 2 && rfm.frequency === 1 && rfm.monetary === 2) {
+      segment = 'High Potentials';
+      goal = 'Expand catalog exposure';
+      promotion = '50% Off Socks Category';
+    } else if (rfm.recency === 3 && rfm.frequency === 2 && rfm.monetary === 1) {
+      segment = 'Small Buyers';
+      goal = 'Re-engage';
+      promotion = '15% Off Next Purchase';
+    } else if (rfm.recency === 4 && rfm.frequency === 1 && rfm.monetary === 1) {
+      segment = 'Dormant Customers';
+      goal = 'Re-engage';
+      promotion = '15% Off Next Purchase';
+    } else if (rfm.recency === 4 && rfm.frequency === 4 && rfm.monetary === 4) {
+      segment = 'Worst Customers';
+      goal = 'Re-engage';
+      promotion = '15% Off Next Purchase';
+      status = false;
+    } else if (rfm.recency === 3 && rfm.frequency === 3 && rfm.monetary === 3) {
+      segment = 'Other';
+      goal = 'Re-engage';
+      promotion = '15% Off Next Purchase';
+      status = false;
+    } else if (rfm.recency === 3 && rfm.frequency === 4 && rfm.monetary === 4) {
+      segment = 'Geography';
+      goal = 'Regional growth';
+      promotion = '15% Off Next Purchase';
+      status = false;
+    }
+
+    return {
+      id: rfm.customer_id,
+      segment,
+      status,
+      goal,
+      promotion,
+      promotionId: null
+    };
+}
+

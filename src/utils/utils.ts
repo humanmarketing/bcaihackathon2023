@@ -61,3 +61,12 @@ export const prepareAiPromptAttributes = (
     product: includeProductAttributes ? product : null,
   };
 };
+
+export const prepareAiPromoPromptAttributes = (promptAttributes: PromptAttributes) => {
+  const { includeProductAttributes, ...restAttributes } = promptAttributes;
+
+  return {
+    ...restAttributes,
+  };
+};
+

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { generateDescription } from '~/server/google-ai';
-import { aiSchema } from './schema';
+import { generatePromotion } from '~/server/google-ai';
+import { aiPromotionAddSchema } from './schema';
 import { authorize } from '~/lib/authorize';
 
 export async function POST(req: NextRequest) {
@@ -9,13 +9,16 @@ export async function POST(req: NextRequest) {
   }
 
   const data: unknown = await req.json();
-  const parsedParams = aiSchema.safeParse(data);
+  const parsedParams = aiPromotionAddSchema.safeParse(data);
+
+  console.log(data);
+  console.log(parsedParams);
 
   if (!parsedParams.success) {
     return new NextResponse('Invalid query parameters', { status: 400 });
   }
 
-  const description = await generateDescription(parsedParams.data);
-
-  return NextResponse.json({ description });
+  const response = await generatePromotion(parsedParams.data);
+  console.log('response', response);
+  return NextResponse.json({ response });
 }

@@ -6,6 +6,7 @@ import { fetchPromotions } from '~/server/bigcommerce-api/client'
 const queryParamSchema = z.object({
     storeHash: z.string(),
     token: z.string(),
+    promoId: z.string().optional(),
   });
 
 export async function GET(req: NextRequest) {
@@ -17,7 +18,11 @@ export async function GET(req: NextRequest) {
       if (!parsedParams.success) {
         return new NextResponse('Invalid query parameters', { status: 400 });
       }
-    console.log('getBcPromotions', parsedParams.data.token, parsedParams.data.storeHash)
+    console.log('getBcPromotions', parsedParams.data.token, parsedParams.data.storeHash, parsedParams.data.promoId)
+    const promoIds = parsedParams.data.promoId ? [parseInt(parsedParams.data.promoId)] : [];
+
+    console.log('promoIds', promoIds)
+    
     const results = await fetchPromotions(
       [],
       parsedParams.data.token,

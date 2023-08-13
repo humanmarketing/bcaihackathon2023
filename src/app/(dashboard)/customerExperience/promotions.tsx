@@ -5,7 +5,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
-import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Switch, Table, Text } from '@bigcommerce/big-design';
+import { Box, Button, Flex, FlexItem, Link, Panel, H1, H2, H3, H4, Switch, Table, Text } from '@bigcommerce/big-design';
 import { EditIcon } from '@bigcommerce/big-design-icons';
 import StatusSwitch from '~/components/StatusSwitch';
 
@@ -19,14 +19,16 @@ export default function Promotions({ token, storeHash }) {
   const params = new URLSearchParams({ storeHash, token }).toString();
 
   const { data: dataCxConfig, isLoading: isLoadingCxConfig, error: errorCxConfig } = useSWR(`/api/getConfig?${params}`, fetcher);
-  console.log('data', dataCxConfig);
+  
 
   const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(`/api/getBcPromotions?${params}`, fetcher);
+  
+
+  if ( isLoadingCxConfig ||  isLoadingBcPromos) return <Text>Loading</Text>;
+  if ( errorCxConfig || errorBcPromos ) return <Text>{errorCxConfig}</Text>;
+  
+  console.log('data', dataCxConfig);
   console.log(dataBcPromos.results);
-
-  if ( isLoadingCxConfig ) return <Text>Loading</Text>;
-  if ( errorCxConfig  ) return <Text>{errorCxConfig}</Text>;
-
 
 
 
@@ -85,7 +87,6 @@ export default function Promotions({ token, storeHash }) {
     <Flex flexDirection="column" padding="xSmall" style={{ minHeight: '90vh' }}>
       <FlexItem>
         <Box marginBottom="large">
-
           <>
           <Panel
               header='Promotions Strategy'
@@ -113,22 +114,25 @@ export default function Promotions({ token, storeHash }) {
                   columns={[
                     { header: 'Promotion', hash: 'promotion', render: ({ promotion }) => promotion },
                     { header: 'Status', hash: 'status', render: ({ promotion, status }) => <StatusSwitch name={promotion} status={status} /> },
-                    { header: '', hash: 'action', render: ({ id }) => <Text><EditIcon size='medium' color='' /> Edit</Text> }
+                    { header: '', hash: 'action', render: ({ id }) => <Link href={`/customerExperience/promotions/${id}`}><EditIcon size='medium' color='' /> Edit</Link> }
 
                   ]}
                   items={promotions}
                 />
             </Panel>
-
           </>
         </Box>
-
-
       </FlexItem>
-
     </Flex>
   );
 }
+
+// function PromoLink({id}) {
+//   const linkTarget = `/customerExperience/promotions/${id}`;
+//   return (
+//     <Link href={linkTarget}><EditIcon size='medium' color='' /> Edit</Link>
+//   )
+// }
  
 // function StatusSwitch({ name, status}) {
 //   const [checked, setChecked] = useState(status);

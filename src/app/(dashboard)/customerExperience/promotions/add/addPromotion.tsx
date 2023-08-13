@@ -73,10 +73,9 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
             </AIBox>
             <AIBox
               backgroundColor="white"
-              border="box"
+              border="none"
               borderRadius="normal"
               marginTop="xLarge"
-              padding="medium"
             >
               <Flex
                 justifyContent="stretch"
@@ -85,44 +84,15 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
                 <FlexItem
                   flexGrow={1}
                 >
-                  <Flex
-                    justifyContent="stretch"
-                    flexDirection="row"
-                  >
-                    <FlexItem
-                      flexGrow={1}
-                    >
-
-                      <AITextArea
-                        key="promoInput"
-                        rows={3}
-                        placeholder="Placeholder"
-                        // onChange={(event) => handleInputChange(event.target.value)}
-                        onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                          setNewMessage(event.target.value) }
-                        value={newMessage}
-                        // value="test message"
-                      />
-                    </FlexItem>
-                    <FlexItem
-                      flexGrow={0}
-                      flexShrink={1}
-                    >
-                      <Flex
-                        alignItems="flex-end"
-                        flexDirection="column"
-                        justifyContent='flex-end'
-                      >
-                        <FlexItem
-                          flexGrow={1}
-                        >
-                            <ChevronRightIcon />
-                        </FlexItem>
-                      </Flex>
-                    </FlexItem>
-                  </Flex>
+                  <AITextArea
+                    key="promoInput"
+                    rows={3}
+                    placeholder="Respond here"
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                      setNewMessage(event.target.value) }
+                    value={newMessage}
+                  />
                 </FlexItem>
-                
               </Flex>
             </AIBox>
             <Button
@@ -132,7 +102,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
               variant="secondary"
               onClick={() => void handleGeneratePromotion(chat, newMessage)}
             >
-              Generate
+              Send Message
             </Button>
           </Panel>
       </>
@@ -143,7 +113,12 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
     console.log('handleGeneratePromotion')
     setIsPrompting(true);
 
-    const newMessageObj = {"author": "user", "content": newMessage};
+    let newMessageContent = newMessage;
+    if(chat.length === 0) {
+      newMessageContent += ` What would you recommend for the ${segmentName} segment?`;
+    }
+
+    const newMessageObj = {"author": "user", "content": newMessageContent};
 
     let messages: any[] = [...chat, newMessageObj];
 
@@ -161,10 +136,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
     console.log('results');
     console.log(results)
     setResults({ promptAttributes: currentAttributes, response: results.response.candidates[0]?.content });
-    // const chatUpdate = results.response.messages.push({
-    //   "author": "system", 
-    //   "content": results.response.candidates[0]?.content
-    // });
+
     addMessageToChat("user", newMessage);
     addMessageToChat("system", results.response.candidates[0]?.content);
     setIsPrompting(false);

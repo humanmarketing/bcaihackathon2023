@@ -78,12 +78,103 @@ export async function recommendPromotion(
 ): Promise<any> {
   const input = preparePromotionAddInput(attributes);
 
-  const prompt = `Act as an e-commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. Task: Recommend a promotion for the provided customer segment. Then confirm the details and return the JSON body for the API request to create the promotion (according to the Promotions API documentation below). Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the API request body.\n\n---\n\n## Creating Promotions Using BigCommerce Promotions API\n\nPromotions in e-commerce are a powerful way to offer discounts to customers based on specific criteria. BigCommerce provides a Promotions API that allows merchants to create various types of promotions, including buy one get one (BOGO) offers and coupon codes. This guide will walk you through the process of creating promotions using the Promotions API.\n\n### Promotion Basics\n\nPromotions can be created with two main components: rules and actions. A rule defines the conditions that must be met for the promotion to apply, and an action defines the discount or offer that will be given. There are also notifications that inform customers about the promotion's details.\n\n### Creating a Buy One Get One (BOGO) Promotion\n\nHere's a step-by-step breakdown of creating a BOGO promotion using the BigCommerce Promotions API:\n\n1. Set Up the Basics\n   - Name your promotion.\n   - Choose a redemption type (AUTOMATIC in this case).\n   - Define the start date and status.\n\n2. Create the Action\n   - Specify the action type (Cart Items Action).\n   - Set the discount type (percentage amount).\n   - Choose a strategy (LEAST_EXPENSIVE).\n   - Specify if the discount should be distributed among items.\n\n3. Configure the Rule\n   - Define the condition type (Cart Condition).\n   - Set the minimum quantity required for the promotion to trigger.\n   - Optionally, set a minimum spend requirement.\n\n4. Add Notifications\n   - Create notifications for different stages of the promotion (UPSELL, ELIGIBLE, APPLIED).\n   - Define the content and locations where the notifications will appear.\n\n5. Finalize the Promotion\n   - Set the promotion's priority.\n   - Decide whether the promotion should stop other promotions from applying.\n   - Set the maximum usage limit (max uses) and end date.\n   - Define the currency code.\n\n### Coupon Promotions\n\nFor coupon promotions, use the redemption type \"COUPON.\" You can create coupon codes with specific properties, such as a maximum usage limit.\n\n### Using Logical Operators\n\nLogical operators (AND, OR, NOT) allow you to create more complex promotions based on multiple conditions. For example, you can require customers to meet specific criteria from different categories or brands.\n\n### Additional Notes\n\n- Active and inactive promotions depend on criteria like start date, end date, and max uses.\n- Priority controls the order of applying multiple promotions.\n- Apply once determines if a promotion can apply multiple times.\n- As total decides how discounts are distributed among items.\n- Promotions can target specific customer groups or exclude certain categories.\n\nRemember that promotions can be more complex than explained here. This guide covers the basics of creating promotions using the BigCommerce Promotions API. For more details and advanced scenarios, refer to the official Promotions API documentation.
-    The conversation begain with user being asked "Would you like to add a promotion per the details below?" 
-      ${input}`;
+  const prompt = `Act as an e-commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. 
+    Task: Guide the conversation and finally recommend a promotion for the provided customer segment. Confirm the details and return the details for the promotion. Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the JSON.
+    The steps in the conversation should be: 
+    1. Recommend a promotion to target the customer segment. Ask the user to approve the direction.
+    2. Then, confirm the details such as promotion type and discount with the user. Ask the user to approve the details.
+    3. Then, upon approved confirmation from the user, include the details of the promotion in the final message as a JSON object. Do not refer to it as "code" or as "JSON". It should be referenced as "details". It should be prefixed with [--CODE--]. The JSON should be wrapped with a triple back tick before and after. 
+    The promotion needs an action and notifications. The action can be one of the following: [{"action":"cart_value","action_name":"Cart Value","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"cart_items","action_name":"Cart Items","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"gift_item","action_name":"Gift Item","discount":{"gift_item":{"quantity":"integer","product_id":"integer","variant_id":"integer"}}},{"action":"shipping","action_name":"Shipping","discount":{"shipping":{"free_shipping":"boolean"}}}]
+    The recommendation goals & offers can following the guidelines from here: [{"segmentName":"Top Customers","goal":"Reduce friction and maintain margins","possible_promotions":["Free Shipping","Free Shipping on Orders Over $50","10% Off All Orders"]},{"segmentName":"Dormant Customers","goal":"Re-engage the shopper with strong offer","possible_promotions":["20% Off All Purchases Site Wide","Free gift with purchase"]},{"segmentName":"Loyal Customers","goal":"Increase loyalty and average order value","possible_promotions":["Free Gift on Orders Over $200","Free Shipping on All Orders","10% Off All Orders"]},{"segmentName":"High Potentials","goal":"Expand product catalog exposure","possible_promotions":["25% Off Purchase of Items from New Collection","10% Off All Orders"]},{"segmentName":"Small Buyers","goal":"Increase lifetime value","possible_promotions":["10% Off Next Purchase","Free Item with Purchase"]}]
+    This is for a store on the BigCommerce platform. 
+    DO NOT tell the user how to do this inside the BigCommerce platform dashboard.
+    This conversation started with user being asked "Would you like to add a promotion per the details below?" This conversation should have some back and forth before you can provide the final message unless the user provides all the deatils.
+    ${input}`;
   
-
   console.log('prompt', prompt);
+
+  const examples = [
+    {
+        "input": {
+            "author": "user",
+            "content": "Create a promotion for the Top Customers segment with a goal of reducing friction and maintaining margins."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure. We recommend creating a promotion to offer free shipping on all orders. What do you think?"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Create a promotion for the Dormant Customers segment with a goal of re-engaging the shopper."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Yes. We recommend creating a promotion offering 15% off all purchases site wide. How does that sound?"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Actually, let\'s offer 50% off."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure. So we\'ll offer 50% off any product to all customers that belong to that customer segment. Are you ready to create this promotion?"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, let\'s create that promotion"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Great.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'fixed_amount\',\'discount_name\':\'Fixed Discount\',\'value_type\':\'fixed_amount\',\'value_example\':\'10.0\'}]}```"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, let\'s create that 20% off promotion"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Great. We will create a promotion for a 20.0% discount on the cart value.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage\',\'value_example\':\'20.0\'}]}```"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Let\'s get started we recommend re-engaging dormant customers with a 20% off discount from all orders."
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, what would you recommend for the Top Customers segment?"
+        },
+        "output": {
+            "author": "bot",
+            "content": "For the Top Customers segment, we recommend offering free shipping on all orders. This will help to reduce friction and maintain margins."
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, let\'s go with that"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure, let's go with that.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage_amount\',\'value_example\':\'10.0\'}]}```"
+        }
+    }
+  ]
 
   try {
     const client = new DiscussServiceClient({
@@ -92,7 +183,7 @@ export async function recommendPromotion(
 
     const response = await client.generateMessage({
       model: 'models/chat-bison-001',
-      prompt: { context: prompt, messages: chat }
+      prompt: { context: prompt, messages: chat, examples: examples }
     });
 
     console.log('chat response', response);
@@ -104,6 +195,109 @@ export async function recommendPromotion(
     // if (response && response[0] && response[0].candidates) {
     //   return response[0].candidates[0]?.output || 'No response from Google AI';
     // }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return 'No response from Google AI';
+}
+
+export async function onboardStoreAccount(
+  attributes: z.infer<typeof aiPromotionAddSchema>,
+  chat: any[]
+): Promise<any> {
+  const input = preparePromotionAddInput(attributes);
+
+  const prompt = `I want you to welcome and onboard a user to the "Ecommerce Copilot AI" application.
+    You need to get answers to the following questions:
+    1. Would you like to grow revenue with existing customers?
+    2. Should we also target guest & non-logged in customers?
+    3. Would you like to run post-purchase cross-sells based on their interests?
+    
+    While there are still more questions that need to be answered. Always end a response with a question instead of a statement.
+    ${input}`;
+  
+  console.log('prompt', prompt);
+
+  const examples = [
+    {
+        "input": {
+            "author": "user",
+            "content": "Create a promotion for the Top Customers segment with a goal of reducing friction and maintaining margins."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure. We recommend creating a promotion to offer free shipping on all orders."
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Create a promotion for the Dormant Customers segment with a goal of re-engaging the shopper."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Yes. We recommend creating a promotion offering 15% off all purchases site wide."
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Actually, let\'s offer 50% off."
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure. So we\'ll offer 50% off any product to all customers that belong to that customer segment. Are you ready to create this promotion?"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, let\'s create that promotion"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Great. Here\'s the code.[--CODE--]{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'fixed_amount\',\'discount_name\':\'Fixed Discount\',\'value_type\':\'fixed_amount\',\'value_example\':\'10.0\'}]}"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, let\'s create that 20% off promotion"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Great. Here\'s the code.[--CODE--]{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage\',\'value_example\':\'20.0\'}]}"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Let\'s get started we recommend re-engaging dormant customers with a 20% off discount from all orders."
+        }
+    }
+  ]
+
+  try {
+    const client = new DiscussServiceClient({
+      authClient: new GoogleAuth().fromAPIKey(API_KEY),
+    });
+
+    const response = await client.generateMessage({
+      model: 'models/chat-bison-001',
+      prompt: { context: prompt, messages: chat, examples: examples }
+    });
+
+    console.log('chat response', response);
+
+    if (response && response[0] && response[0].candidates) {
+      return response[0].candidates[0]?.content ? response[0] : 'No response from Google AI';
+    }
+
   } catch (error) {
     console.error(error);
   }
@@ -136,10 +330,9 @@ const prepareInput = (attributes: z.infer<typeof aiSchema>): string => {
 };
 
 const preparePromotionAddInput = (attributes: z.infer<typeof aiPromotionAddSchema>): string => {
-
-    return `Customer segment: [${attributes?.segmentName}]
-        Customer segment ID: [${attributes?.segmentId}]
-        Recommended Goal: Reduce friction; maintain margins`;
+    return `Details for promotion:
+        Customer segment: [${attributes?.segmentName}]
+        Customer segment ID: [${attributes?.segmentId}]`;
 };
 
 const prepareProductAttributes = (

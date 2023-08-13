@@ -14,13 +14,13 @@ export async function POST(req: NextRequest) {
   console.log(data);
   console.log(parsedParams);
 
-  const messages = parsedParams?.data?.messages || [];
-
-  console.log('messages', messages)
-
   if (!parsedParams.success) {
     return new NextResponse('Invalid query parameters', { status: 400 });
   }
+
+  const messages = parsedParams?.data?.messages || [];
+
+  console.log('messages', messages)
 
   const response = await recommendPromotion(parsedParams.data, messages);
   console.log('response', response);

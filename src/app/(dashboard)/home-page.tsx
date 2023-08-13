@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 export default function HomePage() {
-  const setup = true;
+  const setup = false;
 
   const storeHash = 'vdxg1jkwzi';
 

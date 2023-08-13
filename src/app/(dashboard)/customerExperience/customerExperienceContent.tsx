@@ -7,14 +7,13 @@ import Promotions from './promotions';
 import Segments from './segments';
 
 export default function CustomerExperienceContent({ token, storeHash, config }) {
-
     const [activeTab, setActiveTab] = useState('tab-1');
 
     const tabs = [
-        { ariaControls: 'tab-1', id: 'tab-1', title: 'Customer Segmentation' },
-        { ariaControls: 'tab-2', id: 'tab-2', title: 'Promotions' },
-        { ariaControls: 'tab-3', id: 'tab-3', title: 'Product Pairings' }
-      ];
+      { ariaControls: 'tab-1', id: 'tab-1', title: 'Customer Segmentation' },
+      { ariaControls: 'tab-2', id: 'tab-2', title: 'Promotions' },
+      { ariaControls: 'tab-3', id: 'tab-3', title: 'Product Pairings' }
+    ];
 
 
 

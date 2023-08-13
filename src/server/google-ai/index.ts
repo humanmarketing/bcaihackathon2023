@@ -78,23 +78,10 @@ export async function recommendPromotion(
 ): Promise<any> {
   const input = preparePromotionAddInput(attributes);
 
-  const prompt = `Act as an e - commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. Task: Recommend a promotion for the provided customer segment. Then confirm the details and return the JSON body for the API request to create the promotion (according to the Promotions API documentation below). Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the API request body. The user has been asked "Would you like to add a promotion to the Top Customers segment?" 
+  const prompt = `Act as an e-commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. Task: Recommend a promotion for the provided customer segment. Then confirm the details and return the JSON body for the API request to create the promotion (according to the Promotions API documentation below). Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the API request body.\n\n---\n\n## Creating Promotions Using BigCommerce Promotions API\n\nPromotions in e-commerce are a powerful way to offer discounts to customers based on specific criteria. BigCommerce provides a Promotions API that allows merchants to create various types of promotions, including buy one get one (BOGO) offers and coupon codes. This guide will walk you through the process of creating promotions using the Promotions API.\n\n### Promotion Basics\n\nPromotions can be created with two main components: rules and actions. A rule defines the conditions that must be met for the promotion to apply, and an action defines the discount or offer that will be given. There are also notifications that inform customers about the promotion's details.\n\n### Creating a Buy One Get One (BOGO) Promotion\n\nHere's a step-by-step breakdown of creating a BOGO promotion using the BigCommerce Promotions API:\n\n1. Set Up the Basics\n   - Name your promotion.\n   - Choose a redemption type (AUTOMATIC in this case).\n   - Define the start date and status.\n\n2. Create the Action\n   - Specify the action type (Cart Items Action).\n   - Set the discount type (percentage amount).\n   - Choose a strategy (LEAST_EXPENSIVE).\n   - Specify if the discount should be distributed among items.\n\n3. Configure the Rule\n   - Define the condition type (Cart Condition).\n   - Set the minimum quantity required for the promotion to trigger.\n   - Optionally, set a minimum spend requirement.\n\n4. Add Notifications\n   - Create notifications for different stages of the promotion (UPSELL, ELIGIBLE, APPLIED).\n   - Define the content and locations where the notifications will appear.\n\n5. Finalize the Promotion\n   - Set the promotion's priority.\n   - Decide whether the promotion should stop other promotions from applying.\n   - Set the maximum usage limit (max uses) and end date.\n   - Define the currency code.\n\n### Coupon Promotions\n\nFor coupon promotions, use the redemption type \"COUPON.\" You can create coupon codes with specific properties, such as a maximum usage limit.\n\n### Using Logical Operators\n\nLogical operators (AND, OR, NOT) allow you to create more complex promotions based on multiple conditions. For example, you can require customers to meet specific criteria from different categories or brands.\n\n### Additional Notes\n\n- Active and inactive promotions depend on criteria like start date, end date, and max uses.\n- Priority controls the order of applying multiple promotions.\n- Apply once determines if a promotion can apply multiple times.\n- As total decides how discounts are distributed among items.\n- Promotions can target specific customer groups or exclude certain categories.\n\nRemember that promotions can be more complex than explained here. This guide covers the basics of creating promotions using the BigCommerce Promotions API. For more details and advanced scenarios, refer to the official Promotions API documentation.
+    The conversation begain with user being asked "Would you like to add a promotion per the details below?" 
       ${input}`;
   
-  // const messages = [
-  //   {
-  //     "author": "user",
-  //     "content": "Recommend a promotion for Dormant Customers",
-  //   },
-  //   {
-  //     "author": "system",
-  //     "content": "We recommend offering a 10% discount to Dormant Customers.",
-  //   },
-  //   {
-  //     "author": "user",
-  //     "content": "Sounds good",
-  //   },
-  // ]
 
   console.log('prompt', prompt);
 
@@ -150,7 +137,8 @@ const prepareInput = (attributes: z.infer<typeof aiSchema>): string => {
 
 const preparePromotionAddInput = (attributes: z.infer<typeof aiPromotionAddSchema>): string => {
 
-    return `Customer segment: Top Customers
+    return `Customer segment: [${attributes?.segmentName}]
+        Customer segment ID: [${attributes?.segmentId}]
         Recommended Goal: Reduce friction; maintain margins`;
 };
 

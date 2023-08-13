@@ -41,20 +41,17 @@ export const aiSchema = z.union([
   }),
 ]);
 
-export const aiPromotionAddSchema = z.union([
-  z.object({
-    // style: z.string(),
-    // wordCount: z.number(),
-    // optimizedForSeo: z.boolean(),
-    // brandVoice: z.string(),
-    // additionalAttributes: z.string(),
-    // keywords: z.string(),
-    // instructions: z.string(),
-    messages: z.any().optional(),
-    chat: z.any().optional(),
-    newMessage: z.any().optional(),
-  }),
-  z.object({
-    customPrompt: z.string().optional(),
-  }),
-]);
+export const aiPromotionAddSchema = z.object({
+  // style: z.string(),
+  // wordCount: z.number(),
+  // optimizedForSeo: z.boolean(),
+  // brandVoice: z.string(),
+  // additionalAttributes: z.string(),
+  // keywords: z.string(),
+  // instructions: z.string(),
+  messages: z.any().optional(),
+  chat: z.any().optional(),
+  newMessage: z.any().optional(),
+  segmentId: z.string().optional(),
+  segmentName: z.string().optional(),
+});

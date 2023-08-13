@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text, Textarea } from '@bigcommerce/big-design';
 import { ChevronRightIcon } from '@bigcommerce/big-design-icons';
 import { usePromptAttributes } from '~/context/PromptAttributesContext';
+
 import * as db from '~/lib/db';
 import { set } from 'zod';
 import { prepareAiPromptAttributes } from '~/utils/utils';
@@ -42,41 +43,14 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
     instructions: '',
   };
 
-
   const [activeTab, setActiveTab] = useState('tab-1');
 
   const tabs = [
     { ariaControls: 'tab-1', id: 'tab-1', title: 'Guided' },
     { ariaControls: 'tab-2', id: 'tab-2', title: 'Add Manually' },
   ];
-
   console.log(results.response);
   console.log(chat);
-  // console.log('newMessage', newMessage);
-
-  // const debounceDelay = 1000;
-  // let debounceTimeout: NodeJS.Timeout | null = null;
-  // const handleInputChange = (value: string) => {
-  //   // Clear previous timeout if it exists
-  //   if (debounceTimeout) {
-  //     clearTimeout(debounceTimeout);
-  //   }
-
-  //   // Set a new timeout to update the state after the delay
-  //   debounceTimeout = setTimeout(() => {
-  //     setNewMessage(value);
-  //   }, debounceDelay);
-  // };
-
-  // useEffect(() => {
-  //   // Clean up the timeout on component unmount
-  //   return () => {
-  //     if (debounceTimeout) {
-  //       clearTimeout(debounceTimeout);
-  //     }
-  //   };
-  // }, []);
-
 
   const GuidedPromoCreation = ({ results }) => {
     const [newMessage, setNewMessage] = useState<string>('');
@@ -94,7 +68,8 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
               borderRadius="normal"
               padding="medium"
             >
-              <Text>{results.response}</Text>
+              {isPrompting && <Loader minHeight='96px' />}
+              {!isPrompting && <Text>{results.response}</Text>}
             </AIBox>
             <AIBox
               backgroundColor="white"
@@ -117,6 +92,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
                     <FlexItem
                       flexGrow={1}
                     >
+
                       <AITextArea
                         key="promoInput"
                         rows={3}
@@ -173,7 +149,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
 
     const res = await fetch('/api/recommendPromotion', {
       method: 'POST',
-      body: JSON.stringify({messages}),
+      body: JSON.stringify({messages: messages, segmentId: segmentId, segmentName: segmentName}),
     });
   
     if (!res.ok) {

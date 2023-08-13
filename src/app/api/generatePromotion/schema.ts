@@ -41,8 +41,7 @@ export const aiSchema = z.union([
   }),
 ]);
 
-export const aiPromotionAddSchema = z.union([
-  z.object({
+export const aiPromotionAddSchema = z.object({
     // style: z.string(),
     // wordCount: z.number(),
     // optimizedForSeo: z.boolean(),
@@ -53,8 +52,6 @@ export const aiPromotionAddSchema = z.union([
     messages: z.any().optional(),
     chat: z.any().optional(),
     newMessage: z.any().optional(),
-  }),
-  z.object({
-    customPrompt: z.string().optional(),
-  }),
-]);
+    segmentId: z.string().optional(),
+    segmentName: z.string().optional(),
+  });

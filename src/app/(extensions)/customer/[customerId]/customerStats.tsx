@@ -116,6 +116,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
               <FlexItem>
                 <Flex
                   flexDirection='column'
+                  alignItems='flex-end'
                 >
                   <FlexItem>
                     <Badge 
@@ -123,8 +124,46 @@ export default function Stats({ customer, details }: { customer: Customer | null
                       variant="success"
                     />
                   </FlexItem>
-                  <FlexItem>
-                    <Text color='secondary'>RFM: {rfmSegment.recency} - {rfmSegment.frequency} - {rfmSegment.monetary}</Text>
+                  <FlexItem
+                    marginTop={'small'}
+                  >
+                    <Flex
+                      alignContent='center'
+                      flexDirection={'row'}
+                      flexColumnGap={'5px'}
+                      >
+                      <FlexItem>
+                        <Badge 
+                          label="R"
+                          variant="secondary"
+                        />
+                      </FlexItem>
+                      <FlexItem
+                        marginRight={'xxSmall'}
+                      >
+                        <Text color='secondary'>{rfmSegment.recency}</Text>
+                      </FlexItem>
+                      <FlexItem>
+                        <Badge 
+                          label="F"
+                          variant="secondary"
+                        />
+                      </FlexItem>
+                      <FlexItem
+                        marginRight={'xxSmall'}
+                      >
+                        <Text color='secondary'>{rfmSegment.frequency}</Text>
+                      </FlexItem>
+                      <FlexItem>
+                        <Badge 
+                          label="M"
+                          variant="secondary"
+                        />
+                      </FlexItem>
+                      <FlexItem>
+                        <Text color='secondary'>{rfmSegment.monetary}</Text>
+                      </FlexItem>
+                    </Flex>
                   </FlexItem>
                 </Flex>
               </FlexItem>
@@ -250,13 +289,13 @@ function formatDate(inputDate: string): string {
   return `${monthNames[monthIndex]} ${day}, ${year}`;
 }
 
-function calculateDaysDifference(inputDate: string): number {
+function calculateDaysDifference(firstDate: string, lastDate: string | null): number {
   const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
-  const inputDateTime = new Date(inputDate).getTime();
-  const currentDateTime = new Date().getTime();
+  const firstDateTime = new Date(firstDate).getTime();
+  const lasttDateTime = lastDate !== null ? new Date(lastDate).getTime() : new Date().getTime();
 
-  const timeDifference = currentDateTime - inputDateTime;
+  const timeDifference = lasttDateTime - firstDateTime;
   const daysDifference = Math.floor(timeDifference / oneDayInMilliseconds);
 
   return daysDifference;
@@ -274,16 +313,67 @@ function calculateRFMScore(value, quantiles) {
   }
 }
 
+function calculateRecencyScore(most_recent_order_date) {
+  const daysDifference = calculateDaysDifference(most_recent_order_date, null);
+
+  if (daysDifference <= 60) {
+    return 5;
+  } else if (daysDifference < 120) {
+    return 4;
+  } else if (daysDifference < 180) {
+    return 3;
+  } else if(daysDifference <= 365) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
+function calculateFrequencyScore(first_order_date, most_recent_order_date, total_orders) {
+  const daysDifference = calculateDaysDifference(first_order_date, most_recent_order_date);
+  const averageDaysBetweenOrders = daysDifference / parseInt(total_orders);
+
+  if (averageDaysBetweenOrders <= 90) {
+    return 5;
+  } else if (averageDaysBetweenOrders < 180) {
+    return 4;
+  } else if (averageDaysBetweenOrders < 270) {
+    return 3;
+  } else if(averageDaysBetweenOrders <= 365) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
+function calculateMonetaryScore(cltv) {
+  const ltv = parseFloat(cltv);
+
+  if (ltv >= 1000) {
+    return 5;
+  } else if (ltv >= 500) {
+    return 4;
+  } else if (ltv >= 300) {
+    return 3;
+  } else if(ltv >= 150) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
+
+
+
 function performRFMSegmentation(customer) {
-  // Calculate quantiles for Recency, Frequency, and Monetary Value
-  const recencyQuantiles = [0.25, 0.5, 0.75];
-  const frequencyQuantiles = [0.25, 0.5, 0.75];
-  const monetaryQuantiles = [0.25, 0.5, 0.75];
+  // // Calculate quantiles for Recency, Frequency, and Monetary Value
+  // const recencyQuantiles = [0.25, 0.5, 0.75];
+  // const frequencyQuantiles = [0.25, 0.5, 0.75];
+  // const monetaryQuantiles = [0.25, 0.5, 0.75];
   
   // Calculate RFM scores for the provided customer
-  const recency = calculateRFMScore(customer.days_between_first_last_order, recencyQuantiles);
-  const frequency = calculateRFMScore(customer.order_count, frequencyQuantiles);
-  const monetary = calculateRFMScore(customer.most_recent_order_total, monetaryQuantiles);
+  const recency = calculateRecencyScore(customer.days_between_first_last_order);
+  const frequency = calculateFrequencyScore(customer.first_order_date, customer.most_recent_order_date,  customer.order_count);
+  const monetary = calculateMonetaryScore(customer.cltv);
   
   // Create and return the RFM segment for the customer
   const segment = {
@@ -304,38 +394,33 @@ function mapRFMSegmentToSegments(rfm) {
 
     // Map RFM segments to your defined segments and set goals and promotions
 
-    if (rfm.recency === 1 && rfm.frequency === 4 && rfm.monetary === 4) {
+    if (rfm.recency >= 4 && rfm.frequency >= 4 && rfm.monetary >= 4) {
       segment = 'Top Customers';
       goal = 'Reduce friction; maintain margins';
-    } else if (rfm.recency === 2 && rfm.frequency === 3 && rfm.monetary === 3) {
-      segment = 'Loyal Customers';
-      goal = 'Restart purchase pattern';
-      promotion = '20% Off Sitewide';
-    } else if (rfm.recency === 2 && rfm.frequency === 1 && rfm.monetary === 2) {
-      segment = 'High Potentials';
-      goal = 'Expand catalog exposure';
-      promotion = '50% Off Socks Category';
-    } else if (rfm.recency === 3 && rfm.frequency === 2 && rfm.monetary === 1) {
-      segment = 'Small Buyers';
-      goal = 'Re-engage';
-      promotion = '15% Off Next Purchase';
-    } else if (rfm.recency === 4 && rfm.frequency === 1 && rfm.monetary === 1) {
+    } else if (rfm.recency < 2 && rfm.frequency >= 4 && rfm.monetary >= 4) {
       segment = 'Dormant Customers';
       goal = 'Re-engage';
       promotion = '15% Off Next Purchase';
-    } else if (rfm.recency === 4 && rfm.frequency === 4 && rfm.monetary === 4) {
+    } else if (rfm.recency >= 3 && rfm.frequency >= 3 && rfm.monetary >= 3) {
+      segment = 'Loyal Customers';
+      goal = 'Restart purchase pattern';
+      promotion = '20% Off Sitewide';
+    } else if (rfm.recency >= 3 && rfm.monetary >= 2) {
+      segment = 'High Potentials';
+      goal = 'Expand catalog exposure';
+      promotion = '50% Off Socks Category';
+    } else if (rfm.monetary === 1) {
+      segment = 'Small Buyers';
+      goal = 'Re-engage';
+      promotion = '15% Off Next Purchase';
+    } else if (rfm.recency === 1 && rfm.frequency === 1 && rfm.monetary === 1) {
       segment = 'Worst Customers';
       goal = 'Re-engage';
       promotion = '15% Off Next Purchase';
       status = false;
-    } else if (rfm.recency === 3 && rfm.frequency === 3 && rfm.monetary === 3) {
+    } else  {
       segment = 'Other';
       goal = 'Re-engage';
-      promotion = '15% Off Next Purchase';
-      status = false;
-    } else if (rfm.recency === 3 && rfm.frequency === 4 && rfm.monetary === 4) {
-      segment = 'Geography';
-      goal = 'Regional growth';
       promotion = '15% Off Next Purchase';
       status = false;
     }

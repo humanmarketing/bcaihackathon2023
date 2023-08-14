@@ -226,61 +226,41 @@ export async function onboardStoreAccount(
     {
         "input": {
             "author": "user",
-            "content": "Create a promotion for the Top Customers segment with a goal of reducing friction and maintaining margins."
+            "content": "Yes, I'm ready"
         },
         "output": {
             "author": "bot",
-            "content": "Sure. We recommend creating a promotion to offer free shipping on all orders."
+            "content": "Sounds good. Let's get started. I'm going to ask you a few questions to get to know your business better. First, would you like to grow revenue with existing customers?"
         }
     },
     {
         "input": {
             "author": "user",
-            "content": "Create a promotion for the Dormant Customers segment with a goal of re-engaging the shopper."
+            "content": "Yes, I would like to grow revenue with existing customers"
         },
         "output": {
             "author": "bot",
-            "content": "Yes. We recommend creating a promotion offering 15% off all purchases site wide."
+            "content": "Noted. Now, should we also target guest shoppers & non-logged in customers?"
         }
     },
     {
         "input": {
             "author": "user",
-            "content": "Actually, let\'s offer 50% off."
+            "content": "No, I would not like to grow revenue with guest shoppers"
         },
         "output": {
             "author": "bot",
-            "content": "Sure. So we\'ll offer 50% off any product to all customers that belong to that customer segment. Are you ready to create this promotion?"
+            "content": "Okay. Would you like to run post-purchase cross-sells based on their interests?"
         }
     },
     {
         "input": {
             "author": "user",
-            "content": "Yes, let\'s create that promotion"
+            "content": "Yes, let's create post-purchase cross-sells."
         },
         "output": {
             "author": "bot",
-            "content": "Great. Here\'s the code.[--CODE--]{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'fixed_amount\',\'discount_name\':\'Fixed Discount\',\'value_type\':\'fixed_amount\',\'value_example\':\'10.0\'}]}"
-        }
-    },
-    {
-        "input": {
-            "author": "user",
-            "content": "Yes, let\'s create that 20% off promotion"
-        },
-        "output": {
-            "author": "bot",
-            "content": "Great. Here\'s the code.[--CODE--]{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage\',\'value_example\':\'20.0\'}]}"
-        }
-    },
-    {
-        "input": {
-            "author": "user",
-            "content": "Yes"
-        },
-        "output": {
-            "author": "bot",
-            "content": "Let\'s get started we recommend re-engaging dormant customers with a 20% off discount from all orders."
+            "content": "Thanks. We are going to set up the app accordingly. Given the provided feedback, the next step would be to configure promotions for the various customer segments."
         }
     }
   ]

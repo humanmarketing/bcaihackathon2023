@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-
 import styled from 'styled-components';
 import useSWR from 'swr';
-import { Flex, FlexItem, Text, Textarea, Panel, Box, Input } from '@bigcommerce/big-design';
+import { Button, Flex, FlexItem, Text, Textarea, Panel, Box, Input } from '@bigcommerce/big-design';
 import { ChevronRightIcon } from '@bigcommerce/big-design-icons';
+import ChatPrompt from '~/components/ChatPrompt/ChatPrompt';
 
 // import Image from 'next/image';
 
@@ -13,10 +13,16 @@ interface PageProps {
   storeHash: string
 }
 
+const APP_NAME = 'Ecommerce Copilot AI';
+
 export default function HomePage() {
   const setup = false;
 
   const storeHash = 'vdxg1jkwzi';
+
+
+
+
 
 
   return (
@@ -32,66 +38,9 @@ export default function HomePage() {
       : (
         <Panel header="Get Started">
           <Text>
-            Create eye-catching product descriptions in a flash with the Product
-            Description Generator. Using the product information from your catalog,
-            the generator creates product descriptions in limitless styles and
-            voices designed to drive traffic to your storefront and generate sales.
+            Let's get you set up.
           </Text>
-          <AIBox
-            backgroundColor="secondary20"
-            border="box"
-            borderRadius="normal"
-            padding="medium"
-          >
-            <Text>AI Text</Text>
-          </AIBox>
-          <AIBox
-            backgroundColor="white"
-            border="box"
-            borderRadius="normal"
-            marginTop="xLarge"
-            padding="medium"
-          >
-            <Flex
-              justifyContent="stretch"
-              flexDirection="column"
-            >
-              <FlexItem
-                flexGrow={1}
-              >
-                <Flex
-                  justifyContent="stretch"
-                  flexDirection="row"
-                >
-                  <FlexItem
-                    flexGrow={1}
-                  >
-                    <AITextArea
-                      rows={3}
-                      placeholder="Placeholder"
-                    />
-                  </FlexItem>
-                  <FlexItem
-                    flexGrow={0}
-                    flexShrink={1}
-                  >
-                    <Flex
-                      alignItems="flex-end"
-                      flexDirection="column"
-                      justifyContent='flex-end'
-                    >
-                      <FlexItem
-                        flexGrow={1}
-                      >
-                          <ChevronRightIcon />
-                      </FlexItem>
-                    </Flex>
-                  </FlexItem>
-                </Flex>
-              </FlexItem>
-              
-            </Flex>
-          </AIBox>
+          <ChatPrompt endpoint='/api/onboardingGuidedChat' initialMessage={`Welcome to ${APP_NAME}! It only takes a few minutes to get started. Are you ready?`} />
         </Panel>
       )}
     </Box>

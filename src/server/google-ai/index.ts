@@ -206,15 +206,18 @@ export async function onboardStoreAccount(
   attributes: z.infer<typeof aiPromotionAddSchema>,
   chat: any[]
 ): Promise<any> {
-  const input = preparePromotionAddInput(attributes);
+  const input = '';
 
-  const prompt = `I want you to welcome and onboard a user to the "Ecommerce Copilot AI" application.
+  const prompt = `Start a new conversation.
+    I want you to welcome and onboard a user to the "Ecommerce Copilot AI" application.
     You need to get answers to the following questions:
     1. Would you like to grow revenue with existing customers?
     2. Should we also target guest & non-logged in customers?
     3. Would you like to run post-purchase cross-sells based on their interests?
     
     While there are still more questions that need to be answered. Always end a response with a question instead of a statement.
+
+    The user has been asked the following question to initiate the conversation: "Welcome to Ecommerce Copilot AI! It only takes a few minutes to get started. Are you ready?"
     ${input}`;
   
   console.log('prompt', prompt);

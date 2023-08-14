@@ -92,8 +92,8 @@ export default function Stats({ customer, details }: { customer: Customer | null
     );
 
 
-  const rfmSegment = performRFMSegmentation(details);
-  const mappedSegments = mapRFMSegmentToSegments(rfmSegment);
+  const segmentationScores = performSegmentation(details);
+  const mappedSegments = mapScoresToSegments(segmentationScores);
 
 
   const statBoxStyles = `flexGrow: 1, flexShrink: 1, flexBasis: 0, padding: 'xSmall'`;
@@ -141,7 +141,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                       <FlexItem
                         marginRight={'xxSmall'}
                       >
-                        <Text color='secondary'>{rfmSegment.recency}</Text>
+                        <Text color='secondary'>{segmentationScores.recency}</Text>
                       </FlexItem>
                       <FlexItem>
                         <Badge 
@@ -152,7 +152,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                       <FlexItem
                         marginRight={'xxSmall'}
                       >
-                        <Text color='secondary'>{rfmSegment.frequency}</Text>
+                        <Text color='secondary'>{segmentationScores.frequency}</Text>
                       </FlexItem>
                       <FlexItem>
                         <Badge 
@@ -161,7 +161,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                         />
                       </FlexItem>
                       <FlexItem>
-                        <Text color='secondary'>{rfmSegment.monetary}</Text>
+                        <Text color='secondary'>{segmentationScores.monetary}</Text>
                       </FlexItem>
                     </Flex>
                   </FlexItem>
@@ -209,11 +209,17 @@ export default function Stats({ customer, details }: { customer: Customer | null
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Days Since Last Order:</Text>
-                      <Text marginTop='none' marginBottom='none'>{calculateDaysDifference(details.most_recent_order_date)}</Text>
+                      <Text marginTop='none' marginBottom='none'>{calculateDaysDifference(details.most_recent_order_date, null)}</Text>
                     </Box>
                   </FlexItem>
                 </Flex>
                 <Flex alignContent='stretch' flexDirection='row' flexGap='1rem' marginTop='small'>
+                  <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
+                    <Box border='box' padding='xSmall'>
+                      <Text bold marginBottom='xSmall'>Discount Usage:</Text>
+                      <Text marginTop='none' marginBottom='none'>{segmentationScores.discountFrequency}%</Text>
+                    </Box>
+                  </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Original Source:</Text>
@@ -225,8 +231,6 @@ export default function Stats({ customer, details }: { customer: Customer | null
                       <Text bold marginBottom='xSmall'>Latest Source:</Text>
                       <Text marginTop='none' marginBottom='none'>Email</Text>
                     </Box>
-                  </FlexItem>
-                  <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                   </FlexItem>
                 </Flex>
             </Panel>
@@ -362,18 +366,23 @@ function calculateMonetaryScore(cltv) {
   }
 }
 
+function calculateDiscountFrenquency(total_orders, number_of_discounted_orders) {
+  const totalOrders = parseInt(total_orders);
+  const numberOfDiscountedOrders = parseInt(number_of_discounted_orders);
+
+  return ((numberOfDiscountedOrders / totalOrders) * 100).toFixed(2);
+}
 
 
-function performRFMSegmentation(customer) {
-  // // Calculate quantiles for Recency, Frequency, and Monetary Value
-  // const recencyQuantiles = [0.25, 0.5, 0.75];
-  // const frequencyQuantiles = [0.25, 0.5, 0.75];
-  // const monetaryQuantiles = [0.25, 0.5, 0.75];
-  
+
+function performSegmentation(customer) {
   // Calculate RFM scores for the provided customer
   const recency = calculateRecencyScore(customer.days_between_first_last_order);
   const frequency = calculateFrequencyScore(customer.first_order_date, customer.most_recent_order_date,  customer.order_count);
   const monetary = calculateMonetaryScore(customer.cltv);
+
+  // Review Discount propensity
+  const discountFrequency = calculateDiscountFrenquency(customer.order_count, customer.number_of_discounted_orders);
   
   // Create and return the RFM segment for the customer
   const segment = {
@@ -381,39 +390,44 @@ function performRFMSegmentation(customer) {
     recency,
     frequency,
     monetary,
+    discountFrequency
   };
   
   return segment;
 }
 
-function mapRFMSegmentToSegments(rfm) {
+function mapScoresToSegments(scores) {
     let segment = '';
     let goal = '';
     let promotion = '';
     let status = true; // Default to true for segments without specific status
 
-    // Map RFM segments to your defined segments and set goals and promotions
+    // Map scores segments to your defined segments and set goals and promotions
 
-    if (rfm.recency >= 4 && rfm.frequency >= 4 && rfm.monetary >= 4) {
+    if (scores.recency >= 4 && scores.frequency >= 4 && scores.monetary >= 4) {
       segment = 'Top Customers';
       goal = 'Reduce friction; maintain margins';
-    } else if (rfm.recency < 2 && rfm.frequency >= 4 && rfm.monetary >= 4) {
+    } else if (scores.recency < 2 && scores.frequency >= 4 && scores.monetary >= 4) {
       segment = 'Dormant Customers';
       goal = 'Re-engage';
       promotion = '15% Off Next Purchase';
-    } else if (rfm.recency >= 3 && rfm.frequency >= 3 && rfm.monetary >= 3) {
+    } else if (scores.recency >= 3 && scores.frequency >= 3 && scores.monetary >= 3) {
       segment = 'Loyal Customers';
       goal = 'Restart purchase pattern';
       promotion = '20% Off Sitewide';
-    } else if (rfm.recency >= 3 && rfm.monetary >= 2) {
+    } else if (scores.discountFrequency >= 75) {
+      segment = 'Discount Chasers';
+      goal = 'Restart purchase pattern';
+      promotion = '20% Off Sitewide';
+    } else if (scores.recency >= 3 && scores.monetary >= 2) {
       segment = 'High Potentials';
       goal = 'Expand catalog exposure';
       promotion = '50% Off Socks Category';
-    } else if (rfm.monetary === 1) {
+    } else if (scores.monetary === 1) {
       segment = 'Small Buyers';
       goal = 'Re-engage';
       promotion = '15% Off Next Purchase';
-    } else if (rfm.recency === 1 && rfm.frequency === 1 && rfm.monetary === 1) {
+    } else if (scores.recency === 1 && scores.frequency === 1 && scores.monetary === 1) {
       segment = 'Worst Customers';
       goal = 'Re-engage';
       promotion = '15% Off Next Purchase';
@@ -426,7 +440,7 @@ function mapRFMSegmentToSegments(rfm) {
     }
 
     return {
-      id: rfm.customer_id,
+      id: scores.customer_id,
       segment,
       status,
       goal,

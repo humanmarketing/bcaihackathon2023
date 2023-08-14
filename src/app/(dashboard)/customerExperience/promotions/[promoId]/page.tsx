@@ -2,7 +2,6 @@ import { Suspense, useState } from 'react';
 import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Tabs, Text } from '@bigcommerce/big-design';
 import Loader from '~/components/Loader';
 import { fetchCustomerWithAttributes, fetchProductWithAttributes } from '~/server/bigcommerce-api';
-import generateDescription from '~/server/google-ai';
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 import PromotionEdit from './promotionEdit';

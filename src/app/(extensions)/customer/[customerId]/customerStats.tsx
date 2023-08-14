@@ -214,9 +214,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                     </Flex>
                   </FlexItem>
                 </Flex>
-
             </Panel>
-
           </>
         </Box>
         ) : (
@@ -225,9 +223,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
         </Box>
         )
         }
-
       </FlexItem>
-
     </Flex>
   );
 }

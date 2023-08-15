@@ -15,10 +15,10 @@ export default function Header({ minHeight = '50vh' }) {
       <FlexItem>
         <Link href="/">
           <Image
-            src="/images/logoipsum.png"
+            src="/images/ecommercecopilotai-logo.png"
             alt="Example"
             width={200}
-            height={94}
+            height={56}
             priority={true}
           />
         </Link>

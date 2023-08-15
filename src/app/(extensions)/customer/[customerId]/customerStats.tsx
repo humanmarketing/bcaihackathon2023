@@ -24,6 +24,11 @@ interface CustomerDetails {
   first_order_total: string;
   most_recent_order_date: string;
   most_recent_order_total: string;
+  most_recent_order_first_touch_medium: string;
+  most_recent_order_first_touch_source: string;
+  most_recent_order_last_touch_medium: string;
+  most_recent_order_last_touch_source: string;
+  most_recent_order_session_duration: string;
   number_of_discounted_orders: string;
   order_count: string;
   order_frequency_days: string;
@@ -183,7 +188,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'> 
                     <Box border='box' padding='xSmall'>
                       <Text bold marginBottom='xSmall'>Lifetime Value (LTV):</Text>
-                      <H1 as="h4" marginTop='none' marginBottom='none'>${details.cltv}</H1>
+                      <H1 as="h4" marginTop='none' marginBottom='none'>${Number(details.cltv).toFixed(2)}</H1>
                     </Box>
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
@@ -222,14 +227,14 @@ export default function Stats({ customer, details }: { customer: Customer | null
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
-                      <Text bold marginBottom='xSmall'>Original Source:</Text>
-                      <Text marginTop='none' marginBottom='none'>Organic Search</Text>
+                      <Text bold marginBottom='xSmall'>Original Medium / Source:</Text>
+                      <Text marginTop='none' marginBottom='none' capitalize>{details.most_recent_order_first_touch_medium} / {details.most_recent_order_first_touch_source}</Text>
                     </Box>
                   </FlexItem>
                   <FlexItem flexGrow={1} flexShrink={1} flexBasis='0'>
                     <Box border='box' padding='xSmall'>
-                      <Text bold marginBottom='xSmall'>Latest Source:</Text>
-                      <Text marginTop='none' marginBottom='none'>Email</Text>
+                      <Text bold marginBottom='xSmall'>Latest Medium / Source:</Text>
+                      <Text marginTop='none' marginBottom='none' capitalize>{details.most_recent_order_last_touch_medium} / {details.most_recent_order_last_touch_source}</Text>
                     </Box>
                   </FlexItem>
                 </Flex>
@@ -239,7 +244,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
               >
                 <Flex alignContent='stretch' flexDirection='column' flexGap='1rem'>
                   <FlexItem>
-                    <Text><Text as="span" bold>Customer Segment:</Text> Frequent Purchaser (200 Others)</Text>
+                    <Text><Text as="span" bold>Customer Segment:</Text> {mappedSegments.segment} (200 Others)</Text>
                     <Text><Text as="span" bold>Segment Promotion:</Text> Free Shipping</Text>
                   </FlexItem>
                   <FlexItem>
@@ -319,6 +324,8 @@ function calculateRFMScore(value, quantiles) {
 
 function calculateRecencyScore(most_recent_order_date) {
   const daysDifference = calculateDaysDifference(most_recent_order_date, null);
+  console.log("most_recent_order_date", most_recent_order_date)
+  console.log(daysDifference)
 
   if (daysDifference <= 60) {
     return 5;
@@ -377,7 +384,7 @@ function calculateDiscountFrenquency(total_orders, number_of_discounted_orders) 
 
 function performSegmentation(customer) {
   // Calculate RFM scores for the provided customer
-  const recency = calculateRecencyScore(customer.days_between_first_last_order);
+  const recency = calculateRecencyScore(customer.most_recent_order_date);
   const frequency = calculateFrequencyScore(customer.first_order_date, customer.most_recent_order_date,  customer.order_count);
   const monetary = calculateMonetaryScore(customer.cltv);
 

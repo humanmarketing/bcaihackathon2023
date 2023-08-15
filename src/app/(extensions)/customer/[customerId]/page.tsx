@@ -29,11 +29,10 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  // TODO: switch to use dynamic customer id
+  // TODO: switch to use dynamic customer id (Currently overridden to pull production store user details)
   const id = Number(customerId);
-  const detailsId = Number(91332);
+  const detailsId = Number(78238);
 
-  // cover case when customer is not found
   const customer =
     id === 0
       ? null
@@ -45,7 +44,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <Suspense fallback={<Loader />}>
-      <Stats customer={customer} details={customerDetails.dbt_slarkin2_bigcommerce__customers[0]} />
+      <Stats customer={customer} details={customerDetails.dbt_hackathon_bigcommerce__customers[0]} />
     </Suspense>
   );
 }
@@ -83,12 +82,17 @@ const getCustomerInfo = async ({
 const getCustomerDetails = ( customerId: number ) => ({
   query: `
   query MyQuery($customerId: Int!) {
-    dbt_slarkin2_bigcommerce__customers(limit: 10, where: {customer_id: {_eq: $customerId}}) {
+    dbt_hackathon_bigcommerce__customers(limit: 10, where: {customer_id: {_eq: $customerId}}) {
       customer_id
       first_order_date
       first_order_total
       most_recent_order_date
       most_recent_order_total
+      most_recent_order_first_touch_medium
+      most_recent_order_first_touch_source
+      most_recent_order_last_touch_medium
+      most_recent_order_last_touch_source
+      most_recent_order_session_duration
       number_of_discounted_orders
       order_count
       order_frequency_days
@@ -96,6 +100,7 @@ const getCustomerDetails = ( customerId: number ) => ({
       cltv
       days_between_first_last_order
       date_created
+      
     }
   }`,
   variables: {

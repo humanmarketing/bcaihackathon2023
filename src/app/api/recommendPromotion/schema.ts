@@ -50,7 +50,7 @@ export const aiPromotionAddSchema = z.object({
   // keywords: z.string(),
   // instructions: z.string(),
   messages: z.any().optional(),
-  chat: z.any().optional(),
+  attributes: z.any().optional(),
   newMessage: z.any().optional(),
   segmentId: z.string().optional(),
   segmentName: z.string().optional(),

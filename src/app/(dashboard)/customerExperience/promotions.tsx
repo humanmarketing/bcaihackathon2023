@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, Link, Panel, H1, H2, H3, H4, Switch, Table, Text } from '@bigcommerce/big-design';
 import { EditIcon } from '@bigcommerce/big-design-icons';
 import StatusSwitch from '~/components/StatusSwitch';
+import Loader from '~/components/Loader';
 
 const Hr = styled(Flex)`
   margin-left: -${({ theme }) => theme.spacing.xLarge};
@@ -24,7 +25,7 @@ export default function Promotions({ token, storeHash }) {
   const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(`/api/getBcPromotions?${params}`, fetcher);
   
 
-  if ( isLoadingCxConfig ||  isLoadingBcPromos) return <Text>Loading</Text>;
+  if ( isLoadingCxConfig ||  isLoadingBcPromos) return <Loader minHeight='30px'/>;
   if ( errorCxConfig || errorBcPromos ) return <Text>{errorCxConfig}</Text>;
   
   console.log('data', dataCxConfig);

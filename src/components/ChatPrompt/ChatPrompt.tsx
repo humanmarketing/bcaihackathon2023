@@ -7,12 +7,7 @@ import Loader from '~/components/Loader';
 const APP_NAME = 'Ecommerce Copilot AI';
 
 export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }) {
-    // const initialMessage = `Would you like to add a promotion to the ${segmentName} segment?`;
-    const messages = [
-        // {"author": "user", "content": "Hello, I'm looking for a new pair of shoes."},
-        // {"author": "system", "content": "Hi there! I'm the Product Description Generator. I can help you create product descriptions in a flash."}
-        // {"author": "user", "content": "I want red shoes"},
-    ];
+    const messages = [];
     const bottomRef = useRef<any>(null);
     const [results, setResults] = useState<any>({response: messages});
     const [isPrompting, setIsPrompting] = useState(false);
@@ -21,17 +16,16 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
     const [input, setInput] = useState<string>('');
     const initialMessageObj = {"author": "system", "content": initialMessage};
 
-    const addMessageToChat = (author, content) => {
-        const newMessage = { author, content };
+    const addMessageToChat = (author, content, codeBlock) => {
+        const latestMessage = { author, content, codeBlock };
         console.log('addMessageToChat')
-        console.log(newMessage)
-        setChat(prevChat => [...prevChat, newMessage]);
+        console.log(latestMessage)
+        setChat(prevChat => [...prevChat, latestMessage]);
 
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
-
 
     return (
         <>
@@ -41,7 +35,7 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
                 paddingHorizontal={{ mobile: 'medium', tablet: 'xLarge' }}
                 style={{ height: '400px', overflowY: 'auto' }}
             >
-                <SystemMessage message={initialMessageObj} />
+                <SystemMessage message={initialMessageObj} action={null} />
                 <PromptMessages messages={chat} initialMessage={initialMessage} />
                 {isPrompting && <SystemMessageLoader />}
                 {!isPrompting && <UserInput newMessage={newMessage} setNewMessage={setNewMessage} /> }
@@ -63,25 +57,22 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
                 </Button>
             </Box>
         </>
-
     )
-
 }
 
 const PromptMessages = ({ messages, initialMessage }) => {
-    console.log('messages');
-    console.log(messages)
+
     return messages.map((message) => {
         if (message.author === 'system') {
-            return <SystemMessage message={message} />;
+            return <SystemMessage message={message} action={null} />;
         } else if (message.author === 'user') {
             return <UserMessage message={message} />;
         } 
-        return null; // Add a default return value if none of the conditions are met
+        return null; 
     });
 };
 
-const SystemMessage = ( { message }) => {
+const SystemMessage = ( { message, action }) => {
     return (
         <Flex>
             <FlexItem
@@ -92,9 +83,11 @@ const SystemMessage = ( { message }) => {
                     border="box"
                     borderRadius="normal"
                     marginTop="medium"
+                    marginBottom={'xxSmall'}
                     paddingHorizontal={'medium'}
                     paddingTop={'medium'}
                     paddingBottom={'xxSmall'}
+                    shadow='raised'
                     style={{ minHeight: '50px' }}
                 >
                     <Text
@@ -102,9 +95,21 @@ const SystemMessage = ( { message }) => {
                     >
                         {message.content}
                     </Text>
+                    {message?.codeBlock?.isCodeBlock && (
+                        <Flex
+                            justifyContent={'flex-end'}
+                        >
+                            <Button
+                                marginBottom={'none'}
+                            >
+                                Create Promotion
+                            </Button>
+                        </Flex>
+
+                    )}
                     <Text 
                         color="secondary50"
-                        marginTop={'xxSmall'}
+                        
                         style={{ fontSize: '10px', textDecoration: 'underline'}}
                     >{APP_NAME}</Text>
                 </AIBox>
@@ -115,7 +120,6 @@ const SystemMessage = ( { message }) => {
                 <Text> </Text>
             </FlexItem>
         </Flex>
-
     )
 }
 
@@ -131,9 +135,10 @@ const SystemMessageLoader = () => {
                     borderRadius="normal"
                     marginTop="medium"
                     padding="medium"
+                    shadow='raised'
                     style={{ minHeight: '30px' }}
                 >
-                    <Loader minHeight='30px'/>
+                    <Loader minHeight='20px' />
                     <Text 
                         color="secondary40"
                         marginTop={'xxSmall'}
@@ -162,13 +167,14 @@ const UserMessage = ( { message }) => {
                 flexBasis={{ mobile: '100%', tablet: '55%', desktop: '55%' }}
             >
                 <AIBox
-                    backgroundColor="secondary10"
+                    backgroundColor="white"
                     border="box"
                     borderRadius="normal"
                     marginTop="medium"
                     paddingHorizontal={'medium'}
                     paddingTop={'medium'}
                     paddingBottom={'xxSmall'}
+                    shadow='raised'
                     style={{ minHeight: '50px' }}
                 >
                     <Text
@@ -184,13 +190,11 @@ const UserMessage = ( { message }) => {
                     >You</Text>
                 </AIBox>
                 </FlexItem>
-
         </Flex>
     )
 }
 
 const UserInput = ( { newMessage, setNewMessage }) => {
-    // const [newMessage, setNewMessage] = useState<string>('');
 
     return (
         <AIBox
@@ -226,9 +230,6 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
     const currentAttributes = {};
 
     let newMessageContent = newMessage;
-    // if(chat.length === 0) {
-    //   newMessageContent += isPrompting;
-    // }
     const newMessageObj = {"author": "user", "content": newMessageContent};
     addMessageToChat("user", newMessage);
     setNewMessage('');
@@ -242,21 +243,90 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
   
     if (!res.ok) {
       setIsPrompting(false);
-      throw new Error('Cannot generate promotion, try again later');
+      throw new Error('Cannot generate response, try again later');
     }
   
     const results = await res.json();
     console.log('results');
     console.log(results)
-    setResults({ promptAttributes: currentAttributes, response: results.response.candidates[0]?.content });
 
+    let content = results.response.candidates[0]?.content;
+    const codeBlock: CodeBlock = extractCodeBlocks(content);
+
+    console.log('codeBlock', codeBlock);
+
+    if (codeBlock.isCodeBlock) {
+      content = codeBlock.contentBefore + codeBlock.contentAfter;
+    }
+
+
+    setResults({ promptAttributes: currentAttributes, response: content });
     
-    addMessageToChat("system", results.response.candidates[0]?.content);
+    addMessageToChat("system", content, codeBlock);
     setIsPrompting(false);
 };
 
-
+interface CodeBlock {
+    contentBefore: string;
+    contentBetween: string;
+    contentAfter: string;
+    isCodeBlock: boolean;
+  }
   
+function extractCodeBlocks(inputString: string | null | undefined): CodeBlock {
+    const defaultCodeBlock: CodeBlock = {
+      contentBefore: '',
+      contentBetween: '',
+      contentAfter: '',
+      isCodeBlock: false,
+    };
+  
+    if (!inputString) {
+      return defaultCodeBlock;
+    }
+  
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    const matches: string[] = [];
+    let match;
+  
+    while ((match = codeBlockRegex.exec(inputString)) !== null) {
+      matches.push(match[1]);
+    }
+  
+    if (matches.length === 0) {
+      return {
+        ...defaultCodeBlock,
+        contentBefore: inputString,
+      };
+    }
+  
+    const lastMatch = matches[matches.length - 1] as string | undefined;
+
+    if (lastMatch) {
+    const lastMatchIndex = inputString.lastIndexOf(lastMatch) + lastMatch.length;
+
+    const firstMatch = matches[0] as string | undefined;
+    let firstMatchIndex = -1;
+    if (firstMatch && lastMatchIndex >= lastMatch.length + 6) {
+        firstMatchIndex = inputString.indexOf(firstMatch, lastMatchIndex - lastMatch.length - 6);
+    }
+  
+    return {
+      contentBefore: firstMatchIndex >= 0 ? inputString.slice(0, firstMatchIndex - 3) : inputString, // Excluding the three backticks
+      contentBetween: matches.join('\n```'),
+      contentAfter: lastMatchIndex < inputString.length ? inputString.slice(lastMatchIndex + 3) : '', // Excluding the three backticks
+      isCodeBlock: true,
+    };
+  }
+
+  return {
+    contentBefore: inputString,
+    contentBetween: '',
+    contentAfter: '',
+    isCodeBlock: false,
+  };
+
+}
 
 const AIBox = styled(Box)`
   min-height: 6rem;

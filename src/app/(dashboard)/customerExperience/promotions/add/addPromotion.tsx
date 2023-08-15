@@ -70,90 +70,59 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
               Let's create your promotion.
             </Text>
             <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} />
-            {/* <AIBox
-              backgroundColor="secondary20"
-              border="box"
-              borderRadius="normal"
-              padding="medium"
-            >
-              {isPrompting && <Loader minHeight='96px' />}
-              {!isPrompting && <Text>{results.response}</Text>}
-            </AIBox>
-            <AIBox
-              backgroundColor="white"
-              border="none"
-              borderRadius="normal"
-              marginTop="xLarge"
-            >
-              <Flex
-                justifyContent="stretch"
-                flexDirection="column"
-              >
-                <FlexItem
-                  flexGrow={1}
-                >
-                  <AITextArea
-                    key="promoInput"
-                    rows={3}
-                    placeholder="Respond here"
-                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                      setNewMessage(event.target.value) }
-                    value={newMessage}
-                  />
-                </FlexItem>
-              </Flex>
-            </AIBox>
-            <Button
-              marginTop="xSmall"
-              disabled={isPrompting}
-              mobileWidth="auto"
-              variant="secondary"
-              onClick={() => void handleGeneratePromotion(chat, newMessage)}
-            >
-              Send Message
-            </Button> */}
           </Panel>
       </>
     )
   }
 
-  const handleGeneratePromotion = async (chat, newMessage) => {
-    console.log('handleGeneratePromotion')
-    setIsPrompting(true);
+  // const handleGeneratePromotion = async (chat, newMessage) => {
+  //   console.log('handleGeneratePromotion')
+  //   setIsPrompting(true);
 
-    let newMessageContent = newMessage;
-    if(chat.length === 0) {
-      newMessageContent += ` What would you recommend for the ${segmentName} segment?`;
-    }
+  //   let newMessageContent = newMessage;
+  //   if(chat.length === 0) {
+  //     newMessageContent += ` What would you recommend for the ${segmentName} segment?`;
+  //   }
 
-    const newMessageObj = {"author": "user", "content": newMessageContent};
+  //   const newMessageObj = {"author": "user", "content": newMessageContent};
 
-    let messages: any[] = [...chat, newMessageObj];
+  //   let messages: any[] = [...chat, newMessageObj];
 
-    const res = await fetch('/api/recommendPromotion', {
-      method: 'POST',
-      body: JSON.stringify({messages: messages, segmentId: segmentId, segmentName: segmentName}),
-    });
+  //   const res = await fetch('/api/recommendPromotion', {
+  //     method: 'POST',
+  //     body: JSON.stringify({messages: messages, segmentId: segmentId, segmentName: segmentName}),
+  //   });
   
-    if (!res.ok) {
-      setIsPrompting(false);
-      throw new Error('Cannot generate promotion, try again later');
-    }
+  //   if (!res.ok) {
+  //     setIsPrompting(false);
+  //     throw new Error('Cannot generate promotion, try again later');
+  //   }
   
-    const results = await res.json();
-    console.log('results');
-    console.log(results)
-    setResults({ promptAttributes: currentAttributes, response: results.response.candidates[0]?.content });
+  //   const results = await res.json();
+  //   console.log('results');
+  //   console.log(results)
 
-    addMessageToChat("user", newMessage);
-    addMessageToChat("system", results.response.candidates[0]?.content);
-    setIsPrompting(false);
-  };
 
-  const addMessageToChat = (author, content) => {
-    const newMessage = { author, content };
-    setChat(prevChat => [...prevChat, newMessage]);
-  };
+  //   let content = results.response.candidates[0]?.content;
+  //   const codeBlock: CodeBlock = extractCodeBlocks(content);
+
+  //   if (codeBlock.isCodeBlock) {
+  //     content = codeBlock.contentBefore + codeBlock.contentAfter;
+  //   }
+
+  //   setResults({ promptAttributes: currentAttributes, response: content });
+
+  //   addMessageToChat("user", newMessage);
+  //   addMessageToChat("system", content);
+  //   setIsPrompting(false);
+  // };
+
+  // const addMessageToChat = (author, content) => {
+  //   const newMessage = { author, content };
+  //   setChat(prevChat => [...prevChat, newMessage]);
+  // };
+
+
   
 
   return (

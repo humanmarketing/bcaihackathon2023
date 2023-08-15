@@ -74,9 +74,11 @@ export async function generatePromotion(
 
 export async function recommendPromotion(
   attributes: z.infer<typeof aiPromotionAddSchema>,
-  chat: any[]
+  messages: any[]
 ): Promise<any> {
-  const input = preparePromotionAddInput(attributes);
+
+  console.log('attributes', attributes.attributes)
+  const input = preparePromotionAddInput(attributes.attributes);
 
   const prompt = `Act as an e-commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. 
     Task: Guide the conversation and finally recommend a promotion for the provided customer segment. Confirm the details and return the details for the promotion. Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the JSON.
@@ -176,6 +178,9 @@ export async function recommendPromotion(
     }
   ]
 
+  const fullContext  = { context: prompt, messages: messages, examples: examples }
+  // console.log('fullContext', fullContext);
+
   try {
     const client = new DiscussServiceClient({
       authClient: new GoogleAuth().fromAPIKey(API_KEY),
@@ -183,12 +188,18 @@ export async function recommendPromotion(
 
     const response = await client.generateMessage({
       model: 'models/chat-bison-001',
-      prompt: { context: prompt, messages: chat, examples: examples }
+      prompt: fullContext
     });
 
     console.log('chat response', response);
 
     if (response && response[0] && response[0].candidates) {
+      // checkForAction(response[0].candidates[0]?.content);
+
+      
+      // TODO: modify the types to allow
+      // response[0].codeBlocks = codeBlocks;
+
       return response[0].candidates[0]?.content ? response[0] : 'No response from Google AI';
     }
 
@@ -202,79 +213,105 @@ export async function recommendPromotion(
   return 'No response from Google AI';
 }
 
+
+
+interface Example {
+  input: {
+    content: string;
+  };
+  output: {
+    content: string;
+  };
+}
+
 export async function onboardStoreAccount(
   attributes: z.infer<typeof aiPromotionAddSchema>,
-  chat: any[]
+  messages: any[]
 ): Promise<any> {
   const input = '';
 
-  const prompt = `Start a new conversation.
-    I want you to welcome and onboard a user to the "Ecommerce Copilot AI" application.
-    You need to get answers to the following questions:
+  const prompt = `You are a customer success manager that provides a white glove onboarding experience for an e-commerce marketing app.
+    Task: welcome and ask the following questions of a user to the "Ecommerce Copilot AI" application in order to get them started.
+    You must to get answers to the following 3 questions:
     1. Would you like to grow revenue with existing customers?
     2. Should we also target guest & non-logged in customers?
     3. Would you like to run post-purchase cross-sells based on their interests?
     
-    While there are still more questions that need to be answered. Always end a response with a question instead of a statement.
+    When asking each question, end the response message with a question instead of a statement. Only ask one question at a time.
+    Do not ask any questions that are not related to one of the 3 questions above.
+    The final response should be a welcome to the app.
 
     The user has been asked the following question to initiate the conversation: "Welcome to Ecommerce Copilot AI! It only takes a few minutes to get started. Are you ready?"
     ${input}`;
   
   console.log('prompt', prompt);
-
-  const examples = [
+  const examples: Example[] = [
     {
         "input": {
-            "author": "user",
-            "content": "Yes, I'm ready"
+            "content": "Yes, I am ready"
         },
         "output": {
-            "author": "bot",
-            "content": "Sounds good. Let's get started. I'm going to ask you a few questions to get to know your business better. First, would you like to grow revenue with existing customers?"
+            "content": "Sounds good. Let us get started. I am going to ask you a few questions to get to know your business better. First, would you like to grow revenue with existing customers?"
         }
     },
     {
         "input": {
-            "author": "user",
             "content": "Yes, I would like to grow revenue with existing customers"
         },
         "output": {
-            "author": "bot",
             "content": "Noted. Now, should we also target guest shoppers & non-logged in customers?"
         }
     },
     {
         "input": {
-            "author": "user",
             "content": "No, I would not like to grow revenue with guest shoppers"
         },
         "output": {
-            "author": "bot",
             "content": "Okay. Would you like to run post-purchase cross-sells based on their interests?"
         }
     },
     {
         "input": {
-            "author": "user",
-            "content": "Yes, let's create post-purchase cross-sells."
+            "content": "Yes, let us create post-purchase cross-sells."
         },
         "output": {
-            "author": "bot",
-            "content": "Thanks. We are going to set up the app accordingly. Given the provided feedback, the next step would be to configure promotions for the various customer segments."
+            "content": "Thanks. We are going to set up the app accordingly."
         }
+    },
+    {
+      "input": {
+        "content": "Let's start"
+      },
+      "output": {
+        "content": "Sure. It just takes a few minutes to get started.\nThe first question is would you like to grow revenue with existing customers?"
+      }
+    },
+    {
+      "input": {
+        "content": "Yes, I would you like to run post-purchase cross-sells based on their interests"
+      },
+      "output": {
+        "content": "Great! That's a great way to increase sales. Now that we have all your input, we are going to set up the app accordingly.\n \nWelcome to Ecommerce Copilot AI! "
+      }
     }
   ]
+
+
 
   try {
     const client = new DiscussServiceClient({
       authClient: new GoogleAuth().fromAPIKey(API_KEY),
     });
 
-    console.log('chat', chat);
+    const fullContext  = { context: prompt, messages: messages, examples: examples }
+    console.log('fullContext', fullContext);
 
     const response = await client.generateMessage({
       model: 'models/chat-bison-001',
-      prompt: { context: prompt, messages: chat, examples: examples }
+      prompt: fullContext,
+      temperature: 0.2,
+      topK: 40,
+      topP: 0.95
     });
 
     console.log('chat response', response);

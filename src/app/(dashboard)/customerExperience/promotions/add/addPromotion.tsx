@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import useSWR from 'swr';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text, Textarea } from '@bigcommerce/big-design';
 import { ChevronRightIcon } from '@bigcommerce/big-design-icons';
+import PromotionUpsert from '~/components/Promotion/PromotionUpsert';
 import { usePromptAttributes } from '~/context/PromptAttributesContext';
+import ChatPrompt from '~/components/ChatPrompt/ChatPrompt';
 
 import * as db from '~/lib/db';
 import { set } from 'zod';
@@ -55,6 +57,11 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
   const GuidedPromoCreation = ({ results }) => {
     const [newMessage, setNewMessage] = useState<string>('');
     console.log('newMessage', newMessage)
+    const otherAttributes = {
+      segmentId: segmentId,
+      segmentName: segmentName
+    }
+
 
     return (
       <>
@@ -62,7 +69,8 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
             <Text>
               Let's create your promotion.
             </Text>
-            <AIBox
+            <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} />
+            {/* <AIBox
               backgroundColor="secondary20"
               border="box"
               borderRadius="normal"
@@ -103,7 +111,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
               onClick={() => void handleGeneratePromotion(chat, newMessage)}
             >
               Send Message
-            </Button>
+            </Button> */}
           </Panel>
       </>
     )
@@ -163,8 +171,8 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
             onTabClick={(setActiveTab)}
           />
           <Box marginTop="medium">
-            {activeTab === 'tab-1' && <GuidedPromoCreation results={results} /> }
-            {activeTab === 'tab-2' && <Text>Manual</Text> }
+            { activeTab === 'tab-1' && <GuidedPromoCreation results={results} /> }
+            { activeTab === 'tab-2' && <PromotionUpsert promoId={null} token={token} storeHash={storeHash} /> }
           </Box>
         </>
         <>

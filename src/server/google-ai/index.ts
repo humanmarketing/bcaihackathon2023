@@ -88,7 +88,7 @@ export async function recommendPromotion(
     The recommendation goals & offers can following the guidelines from here: [{"segmentName":"Top Customers","goal":"Reduce friction and maintain margins","possible_promotions":["Free Shipping","Free Shipping on Orders Over $50","10% Off All Orders"]},{"segmentName":"Dormant Customers","goal":"Re-engage the shopper with strong offer","possible_promotions":["20% Off All Purchases Site Wide","Free gift with purchase"]},{"segmentName":"Loyal Customers","goal":"Increase loyalty and average order value","possible_promotions":["Free Gift on Orders Over $200","Free Shipping on All Orders","10% Off All Orders"]},{"segmentName":"High Potentials","goal":"Expand product catalog exposure","possible_promotions":["25% Off Purchase of Items from New Collection","10% Off All Orders"]},{"segmentName":"Small Buyers","goal":"Increase lifetime value","possible_promotions":["10% Off Next Purchase","Free Item with Purchase"]}]
     This is for a store on the BigCommerce platform. 
     DO NOT tell the user how to do this inside the BigCommerce platform dashboard.
-    This conversation started with user being asked "Would you like to add a promotion per the details below?" This conversation should have some back and forth before you can provide the final message unless the user provides all the deatils.
+    This conversation started with user being asked the question "Would you like to add a promotion per the details below?" This conversation should have some back and forth before you can provide the final message unless the user provides all the deatils.
     ${input}`;
   
   console.log('prompt', prompt);
@@ -269,6 +269,8 @@ export async function onboardStoreAccount(
     const client = new DiscussServiceClient({
       authClient: new GoogleAuth().fromAPIKey(API_KEY),
     });
+
+    console.log('chat', chat);
 
     const response = await client.generateMessage({
       model: 'models/chat-bison-001',

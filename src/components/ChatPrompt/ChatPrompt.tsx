@@ -4,7 +4,9 @@ import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text, Textarea } from '@bigcommerce/big-design';
 import Loader from '~/components/Loader';
 
-export default function ChatPrompt({ endpoint, initialMessage }) {
+const APP_NAME = 'Ecommerce Copilot AI';
+
+export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }) {
     // const initialMessage = `Would you like to add a promotion to the ${segmentName} segment?`;
     const messages = [
         // {"author": "user", "content": "Hello, I'm looking for a new pair of shoes."},
@@ -34,7 +36,10 @@ export default function ChatPrompt({ endpoint, initialMessage }) {
     return (
         <>
             <Box
-                style={{ height: '300px', overflowY: 'scroll' }}
+                backgroundColor={"secondary10"}
+                paddingVertical={'none'}
+                paddingHorizontal={{ mobile: 'medium', tablet: 'xLarge' }}
+                style={{ height: '400px', overflowY: 'auto' }}
             >
                 <SystemMessage message={initialMessageObj} />
                 <PromptMessages messages={chat} initialMessage={initialMessage} />
@@ -42,15 +47,21 @@ export default function ChatPrompt({ endpoint, initialMessage }) {
                 {!isPrompting && <UserInput newMessage={newMessage} setNewMessage={setNewMessage} /> }
                 <div ref={bottomRef}></div>
             </Box>
-            <Button
-                marginTop="xSmall"
-                disabled={isPrompting}
-                mobileWidth="auto"
-                variant="secondary"
-                onClick={() => void handleChatMessage(endpoint, chat, newMessage, setNewMessage, initialMessage, isPrompting, setIsPrompting, setResults, addMessageToChat)}
+            <Box
+                backgroundColor={"secondary10"}
+                paddingBottom={'medium'}
+                paddingHorizontal={{ mobile: 'medium', tablet: 'xLarge' }}
             >
-                Send Message
-            </Button>
+                <Button
+                    marginTop="xSmall"
+                    disabled={isPrompting}
+                    mobileWidth="auto"
+                    variant="secondary"
+                    onClick={() => void handleChatMessage(endpoint, chat, newMessage, setNewMessage, initialMessage, otherAttributes, isPrompting, setIsPrompting, setResults, addMessageToChat)}
+                >
+                    Send Message
+                </Button>
+            </Box>
         </>
 
     )
@@ -72,46 +83,109 @@ const PromptMessages = ({ messages, initialMessage }) => {
 
 const SystemMessage = ( { message }) => {
     return (
-        <AIBox
-            backgroundColor="secondary20"
-            border="box"
-            borderRadius="normal"
-            marginTop="medium"
-            padding="medium"
-            style={{ minHeight: '50px' }}
-        >
-            {message.content}
-        </AIBox>
+        <Flex>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '55%', desktop: '55%' }}
+            >
+                <AIBox
+                    backgroundColor="secondary30"
+                    border="box"
+                    borderRadius="normal"
+                    marginTop="medium"
+                    paddingHorizontal={'medium'}
+                    paddingTop={'medium'}
+                    paddingBottom={'xxSmall'}
+                    style={{ minHeight: '50px' }}
+                >
+                    <Text
+                        marginBottom={'xSmall'}
+                    >
+                        {message.content}
+                    </Text>
+                    <Text 
+                        color="secondary50"
+                        marginTop={'xxSmall'}
+                        style={{ fontSize: '10px', textDecoration: 'underline'}}
+                    >{APP_NAME}</Text>
+                </AIBox>
+            </FlexItem>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '45%', desktop: '45%' }}
+            >
+                <Text> </Text>
+            </FlexItem>
+        </Flex>
+
     )
 }
 
 const SystemMessageLoader = () => {
     return (
-        <AIBox
-            backgroundColor="secondary20"
-            border="box"
-            borderRadius="normal"
-            marginTop="medium"
-            padding="medium"
-            style={{ minHeight: '50px' }}
-        >
-            <Loader minHeight='50px'/>
-        </AIBox>
+        <Flex>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '55%', desktop: '55%' }}
+            >
+                <AIBox
+                    backgroundColor="secondary30"
+                    border="box"
+                    borderRadius="normal"
+                    marginTop="medium"
+                    padding="medium"
+                    style={{ minHeight: '30px' }}
+                >
+                    <Loader minHeight='30px'/>
+                    <Text 
+                        color="secondary40"
+                        marginTop={'xxSmall'}
+                        style={{ fontSize: '10px', textDecoration: 'underline'}}
+                    >{APP_NAME}</Text>
+                </AIBox>
+            </FlexItem>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '45%', desktop: '45%' }}
+            >
+                <Text> </Text>
+            </FlexItem>
+        </Flex>
     )
 }
 
 const UserMessage = ( { message }) => {
     return (
-        <AIBox
-            backgroundColor="white"
-            border="box"
-            borderRadius="normal"
-            marginTop="medium"
-            padding="medium"
-            style={{ minHeight: '50px' }}
-        >
-            {message.content}
-        </AIBox>
+        <Flex>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '45%', desktop: '45%' }}
+            >
+                <Text> </Text>
+            </FlexItem>
+            <FlexItem
+                flexBasis={{ mobile: '100%', tablet: '55%', desktop: '55%' }}
+            >
+                <AIBox
+                    backgroundColor="secondary10"
+                    border="box"
+                    borderRadius="normal"
+                    marginTop="medium"
+                    paddingHorizontal={'medium'}
+                    paddingTop={'medium'}
+                    paddingBottom={'xxSmall'}
+                    style={{ minHeight: '50px' }}
+                >
+                    <Text
+                        color={'secondary60'}
+                        marginBottom={'xSmall'}
+                    >
+                        {message.content}
+                    </Text>
+                    <Text 
+                        color="primary30"
+                        marginTop={'xxSmall'}
+                        style={{ fontSize: '10px', textDecoration: 'underline'}}
+                    >You</Text>
+                </AIBox>
+                </FlexItem>
+
+        </Flex>
     )
 }
 
@@ -120,7 +194,7 @@ const UserInput = ( { newMessage, setNewMessage }) => {
 
     return (
         <AIBox
-            backgroundColor="white"
+            backgroundColor="secondary10"
             border="none"
             borderRadius="normal"
             marginTop="xLarge"
@@ -146,7 +220,7 @@ const UserInput = ( { newMessage, setNewMessage }) => {
     )
 }
 
-const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, initialMessage, isPrompting, setIsPrompting, setResults, addMessageToChat) => {
+const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, initialMessage, otherAttributes, isPrompting, setIsPrompting, setResults, addMessageToChat) => {
     console.log('handleChatMessage')
     setIsPrompting(true);
     const currentAttributes = {};
@@ -159,13 +233,11 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
     addMessageToChat("user", newMessage);
     setNewMessage('');
 
-
-
     let messages: any[] = [...chat, newMessageObj];
 
     const res = await fetch(endpoint, {
       method: 'POST',
-      body: JSON.stringify({ messages: messages }),
+      body: JSON.stringify({ messages: messages, attributes: otherAttributes }),
     });
   
     if (!res.ok) {

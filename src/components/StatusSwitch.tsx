@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import { Switch } from '@bigcommerce/big-design';
 
-export default function StatusSwitch({ name, status}) {
+interface StatusSwitchProps {
+    name: string,
+    status: boolean
+}
+
+export default function StatusSwitch({ name, status}: StatusSwitchProps) {
     const [checked, setChecked] = useState(status);
   
-    const handleChange = async () => {
+    const handleChange = () => {
         const newState = !checked;
         setChecked(newState);
     }

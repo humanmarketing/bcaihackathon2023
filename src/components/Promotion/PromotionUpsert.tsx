@@ -1,12 +1,16 @@
 'use client';
-import {  use, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text } from '@bigcommerce/big-design';
+import { Box, Button, Flex, FlexItem, H1, Input, Select, Stepper, Text } from '@bigcommerce/big-design';
 
 interface PromotionProps {
   promoId?: string;
   name: string;
   rules: any;
+}
+
+interface PromotionResults {
+    results: PromotionProps[];
 }
 
 type InputFieldValue = string | number | boolean | undefined;
@@ -26,49 +30,45 @@ const default_promo = {
     ]
 }
 
+interface PromotionUpsertProps {
+    promoId?: string;
+    token: string;
+    storeHash: string;
+}
 
-export default function PromotionUpsert({ promoId, token, storeHash }) {
-    
-  const [promo, setPromo] = useState<PromotionProps | null>(default_promo);
-  const [currentStep, setCurrentStep] = useState(0);
 
+
+
+export default function PromotionUpsert({ promoId, token, storeHash }: PromotionUpsertProps) {
+    const [promo, setPromo] = useState<PromotionProps | null | undefined>(default_promo);
+    const [currentStep, setCurrentStep] = useState(0);
+  
+    const fetcher = (url: RequestInfo) => fetch(url).then((res) => res.json());
+    let params: string;
     if(promoId !== null && promoId !== undefined) {
-        const fetcher = (url) => fetch(url).then((res) => res.json());
-        const params = new URLSearchParams({ storeHash, token, promoId }).toString();
-        const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(
-            `/api/getBcPromotions?${params}`,
-            fetcher
-        );
-
-        useEffect(() => {
-            if (dataBcPromos && dataBcPromos.results && dataBcPromos.results.length > 0) {
-            setPromo(dataBcPromos.results[0]);
-            }
-        }, [dataBcPromos]);
-
-        if ( isLoadingBcPromos) return <Text>Loading</Text>;
-        if ( errorBcPromos ) return <Text>Error</Text>;
-    }
+        params = new URLSearchParams({ storeHash, token, promoId }).toString();
+    } 
     else {
-        const default_promo = {
-            name: '',
-            rules: [
-                {
-                    action: {
-                        cart_value: {
-                            discount: {
-                                percentage_amount: 0
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-        useEffect(() => {
-            setPromo(default_promo);
-            // console.log('PromotionUpsert')
-        }, [default_promo]);
+        params = new URLSearchParams({ storeHash, token }).toString();
     }
+  
+    const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR<PromotionResults>(
+      promoId !== null && promoId !== undefined ? `/api/getBcPromotions?${params}` : null, 
+      fetcher
+    );
+  
+    useEffect(() => {
+      if (promoId !== null && promoId !== undefined) {
+        if (dataBcPromos && dataBcPromos.results && dataBcPromos.results.length > 0) {
+          setPromo(dataBcPromos.results[0]);
+        }
+      } else {
+        setPromo(default_promo);
+      }
+    }, [dataBcPromos, promoId]);
+  
+    if (isLoadingBcPromos) return <Text>Loading</Text>;
+    if (errorBcPromos) return <Text>Error</Text>;
 
 
 
@@ -83,7 +83,7 @@ export default function PromotionUpsert({ promoId, token, storeHash }) {
         >
 
             <>
-                <H1>{promo !== null ? `Edit Promo ${promo.name}` : `Add Promo` } </H1>
+                <H1>{promo !== null ? `Edit Promo ${promo?.name}` : `Add Promo` } </H1>
 
             <>
             <Stepper currentStep={currentStep} steps={steps} />

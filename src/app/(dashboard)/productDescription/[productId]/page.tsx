@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Loader from '~/components/Loader';
 import { fetchProductWithAttributes } from '~/server/bigcommerce-api';
-import generateDescription from '~/server/google-ai';
+import { generateDescription } from '~/server/google-ai';
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 import Generator from './generator';

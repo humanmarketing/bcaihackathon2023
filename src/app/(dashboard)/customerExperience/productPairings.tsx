@@ -20,7 +20,7 @@ const Hr = styled(Flex)`
 
 export default function ProductPairings() {
   const [recommendations, setRecommendations] = useState([]);
-  const fetcher = (url) => fetch(url).then((res) => res.json());
+  const fetcher = (url: RequestInfo) => fetch(url).then((res) => res.json());
 
   const { data, isLoading, error } = useSWR(`/api/getProductPairings`, fetcher);
   

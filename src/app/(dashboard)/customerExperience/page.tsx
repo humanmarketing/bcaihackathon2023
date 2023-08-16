@@ -1,19 +1,17 @@
-import { Suspense, useState } from 'react';
-import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Tabs, Text } from '@bigcommerce/big-design';
+import { Suspense } from 'react';
 import Loader from '~/components/Loader';
-import { fetchCustomerWithAttributes, fetchProductWithAttributes } from '~/server/bigcommerce-api';
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
-// import Segments from './segments';
 import CustomerExperienceContent from './customerExperienceContent';
 
 
-interface PageProps {
-  params: { customerId: string };
-  searchParams: { email: string };
+interface Config {
+  targetGuestShoppers: boolean,
+  targetPostPurchase: boolean,
+  targetExistingCustomers: boolean,
 }
 
-export default async function Page(props: PageProps) {
+export default async function Page() {
   const authorized = authorize();
 
   if (!authorized) {
@@ -26,7 +24,7 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  const config = await db.getCxConfig(authorized.storeHash);
+  const config:Config = await db.getCxConfig(authorized.storeHash);
 
   console.log('config', config);
 

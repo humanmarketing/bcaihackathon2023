@@ -1,18 +1,24 @@
 'use client';
-import {  useEffect, useState } from 'react';
-import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Tabs, Text } from '@bigcommerce/big-design';
-import * as db from '~/lib/db';
+import {  useState } from 'react';
+import { Box, H1, Tabs } from '@bigcommerce/big-design';
 import ProductPairings from './productPairings';
 import Promotions from './promotions';
 import Segments from './segments';
+
+interface ComponentProps {
+  token: string,
+  storeHash: string,
+  config: any
+}
+
 
 export default function CustomerExperienceContent({ token, storeHash, config }) {
     const [activeTab, setActiveTab] = useState('tab-1');
 
     const tabs = [
-      { ariaControls: 'tab-1', id: 'tab-1', title: 'Customer Segmentation' },
-      { ariaControls: 'tab-2', id: 'tab-2', title: 'Promotions' },
-      { ariaControls: 'tab-3', id: 'tab-3', title: 'Product Pairings' }
+      { ariaControls: 'tab-1', id: 'tab-1', title: 'Promotions' },
+      { ariaControls: 'tab-2', id: 'tab-2', title: 'Customer Segmentation' },
+      { ariaControls: 'tab-3', id: 'tab-3', title: 'Post Purchase Upsells' }
     ];
 
 
@@ -32,8 +38,8 @@ export default function CustomerExperienceContent({ token, storeHash, config }) 
             onTabClick={(setActiveTab)}
           />
           <Box marginTop="medium">
-            {activeTab === 'tab-1' && <Segments storeHash={storeHash} config={config} />}
-            {activeTab === 'tab-2' && <Promotions token={token} storeHash={storeHash} />}
+            {activeTab === 'tab-1' && <Promotions token={token} storeHash={storeHash} />}
+            {activeTab === 'tab-2' && <Segments storeHash={storeHash} config={config} />}
             {activeTab === 'tab-3' && <ProductPairings />}
           </Box>
       </Box>

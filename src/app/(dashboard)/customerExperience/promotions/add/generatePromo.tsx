@@ -18,7 +18,7 @@ export default function GeneratePromotion({ promoId, token, storeHash, config })
   const [promo, setPromo] = useState<PromotionProps | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const fetcher = (url) => fetch(url).then((res) => res.json());
+  const fetcher = (url: RequestInfo) => fetch(url).then((res) => res.json());
   const params = new URLSearchParams({ storeHash, token, promoId }).toString();
   const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(
     `/api/getBcPromotions?${params}`,

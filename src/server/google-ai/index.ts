@@ -1,7 +1,7 @@
 import { type z } from 'zod';
 import { env } from '~/env.mjs';
 import { GoogleAuth } from 'google-auth-library';
-import { DiscussServiceClient, ModelServiceClient, TextServiceClient } from '@google-ai/generativelanguage';
+import { DiscussServiceClient, TextServiceClient } from '@google-ai/generativelanguage';
 
 import { DEFAULT_GUIDED_ATTRIBUTES, STYLE_OPTIONS } from '~/constants';
 import { type aiSchema } from '~/app/api/generateDescription/schema';
@@ -50,7 +50,7 @@ export async function generatePromotion(
     Task: Based on provided input parameters, write a product description
     ${input}`;
 
-  console.log('prompt', prompt);
+  // console.log('prompt', prompt);
 
   try {
     const client = new TextServiceClient({
@@ -78,7 +78,7 @@ export async function recommendPromotion(
 ): Promise<any> {
 
   console.log('attributes', attributes.attributes)
-  const input = preparePromotionAddInput(attributes.attributes);
+  const input = preparePromotionAddInput(attributes);
 
   const prompt = `Act as an e-commerce marketing expert who creates relevant promotions for customer segments in order to maximize the lifetime value. 
     Task: Guide the conversation and finally recommend a promotion for the provided customer segment. Confirm the details and return the details for the promotion. Initiate the conversation by recommending a promotion for the provided segment. Then, guide the user to capture the details. Finally, respond with the JSON.
@@ -93,7 +93,7 @@ export async function recommendPromotion(
     This conversation started with user being asked the question "Would you like to add a promotion per the details below?" This conversation should have some back and forth before you can provide the final message unless the user provides all the deatils.
     ${input}`;
   
-  console.log('prompt', prompt);
+  // console.log('prompt', prompt);
 
   const examples = [
     {
@@ -211,7 +211,7 @@ export async function recommendPromotion(
       prompt: fullContext
     });
 
-    console.log('chat response', response);
+    // console.log('chat response', response);
 
     if (response && response[0] && response[0].candidates) {
       return response[0].candidates[0]?.content ? response[0] : 'No response from Google AI';
@@ -256,7 +256,7 @@ export async function onboardStoreAccount(
     The user has been asked the following question to initiate the conversation: "Welcome to Ecommerce Copilot AI! It only takes a few minutes to get started. Are you ready?"
     ${input}`;
   
-  console.log('prompt', prompt);
+  // console.log('prompt', prompt);
   const examples: Example[] = [
     {
         "input": {
@@ -356,7 +356,7 @@ export async function onboardStoreAccount(
     });
 
     const fullContext  = { context: prompt, messages: messages, examples: examples }
-    console.log('fullContext', fullContext);
+    // console.log('fullContext', fullContext);
 
     const response = await client.generateMessage({
       model: 'models/chat-bison-001',
@@ -366,7 +366,7 @@ export async function onboardStoreAccount(
       topP: 0.95
     });
 
-    console.log('chat response', response);
+    // console.log('chat response', response);
 
     if (response && response[0] && response[0].candidates) {
       return response[0].candidates[0]?.content ? response[0] : 'No response from Google AI';
@@ -401,7 +401,7 @@ export async function generatePromotionCode(
     });
 
     if (response && response[0] && response[0].candidates) {
-      console.log(response);
+      // console.log(response);
       return response[0].candidates[0]?.output || 'No response from Google AI';
     }
   } catch (error) {
@@ -437,16 +437,16 @@ const prepareInput = (attributes: z.infer<typeof aiSchema>): string => {
 
 const preparePromotionAddInput = (attributes: z.infer<typeof aiPromotionAddSchema>): string => {
     return `Details for promotion:
-        Customer segment: [${attributes?.segmentName}]
-        Customer segment ID: [${attributes?.segmentId}]`;
+        Customer segment: [${attributes?.segmentName ? attributes?.segmentName : ''}]
+        Customer segment ID: [${attributes?.segmentId ? attributes?.segmentId : ''}]`;
 };
 
-const preparePromotionCodeInput = (attributes: z.infer<typeof aiPromotionCodeSchema>): string => {
-  return `Details for promotion:
-      Details: [${attributes?.code}]
-      Customer segment: [${attributes?.otherAttributes.segmentName}]
-      Customer segment ID: [${attributes?.otherAttributes.segmentId}]`;
-};
+// const preparePromotionCodeInput = (attributes: z.infer<typeof aiPromotionCodeSchema>): string => {
+//   return `Details for promotion:
+//       Details: [${attributes?.code}]
+//       Customer segment: [${attributes?.otherAttributes?.segmentName ? attributes?.otherAttributes?.segmentName : ''}]
+//       Customer segment ID: [${attributes?.otherAttributes?.segmentId ? attributes?.otherAttributes?.segmentId : ''}]`;
+// };
 
 const prepareProductAttributes = (
   attributes: z.infer<typeof aiSchema>

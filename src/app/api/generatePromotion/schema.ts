@@ -50,7 +50,10 @@ export const aiPromotionAddSchema = z.object({
     // keywords: z.string(),
     // instructions: z.string(),
     messages: z.any().optional(),
-    attributes: z.any().optional(),
+    attributes: z.object({
+      segmentId: z.string(),
+      segmentName: z.string(),
+    }).optional(),
     newMessage: z.any().optional(),
     segmentId: z.string().optional(),
     segmentName: z.string().optional(),
@@ -58,5 +61,8 @@ export const aiPromotionAddSchema = z.object({
 
 export const aiPromotionCodeSchema = z.object({
   code: z.string(),
-  otherAttributes: z.any().optional(),
+  otherAttributes: z.object({
+    segmentId: z.string(),
+    segmentName: z.string(),
+  }).optional(),
 });

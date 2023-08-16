@@ -53,7 +53,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
 
     return (
       <>
-          <Panel header="Creation Promotion with Copilot">
+          <Panel header="Create a Promotion with Copilot">
             <Text>
               Let's create your promotion.
             </Text>
@@ -91,7 +91,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
               />
               <Box marginTop="medium">
                 { activeTab === 'tab-1' && <GuidedPromoCreation results={results} setIsPromoAdded={setIsPromoAdded} /> }
-                { activeTab === 'tab-2' && <PromotionUpsert promoId={null} token={token} storeHash={storeHash} /> }
+                { activeTab === 'tab-2' && <PromotionUpsert token={token} storeHash={storeHash} /> }
               </Box>
             </>
           )}

@@ -22,9 +22,6 @@ export default function HomePage() {
   const otherAttributes = {}
 
 
-
-
-
   return (
     <Box
       marginHorizontal={{ mobile: 'none', tablet: 'xxxLarge' }}

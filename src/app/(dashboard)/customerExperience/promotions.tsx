@@ -20,7 +20,6 @@ export default function Promotions({ token, storeHash }) {
   const params = new URLSearchParams({ storeHash, token }).toString();
 
   const { data: dataCxConfig, isLoading: isLoadingCxConfig, error: errorCxConfig } = useSWR(`/api/getConfig?${params}`, fetcher);
-  
 
   const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR(`/api/getBcPromotions?${params}`, fetcher);
   
@@ -30,49 +29,6 @@ export default function Promotions({ token, storeHash }) {
   
   console.log('data', dataCxConfig);
   console.log(dataBcPromos.results);
-
-
-
-  // const { results, setResults, handleDescriptionChange } =
-  //   useDescriptionsHistory(customer.id);
-  // const [isPrompting, setIsPrompting] = useState(false);
-  // const [description, setDescription] = useState(
-  //   results.at(0)?.description || ''
-  // );
-
-  // const {
-  //   isFormGuided,
-  //   setIsFormGuided,
-  //   currentAttributes,
-  //   guidedAttributes,
-  //   customAttributes,
-  //   setGuidedAttributes,
-  //   setCustomAttributes,
-  // } = usePromptAttributes();
-
-  // const handleGenerateDescription = async () => {
-  //   setIsPrompting(true);
-  //   const res = await fetch('/api/generateDescription', {
-  //     method: 'POST',
-  //     body: JSON.stringify(
-  //       prepareAiPromptAttributes(currentAttributes, product)
-  //     ),
-  //   });
-
-  //   if (!res.ok) {
-  //     setIsPrompting(false);
-  //     throw new Error('Cannot generate description, try again later');
-  //   }
-
-  //   const { description } = (await res.json()) as { description: string };
-  //   setResults({ promptAttributes: currentAttributes, description });
-  //   setIsPrompting(false);
-  // };
-
-  // const descriptionChangeWrapper = (index: number, description: string) => {
-  //   setDescription(description);
-  //   handleDescriptionChange(index, description);
-  // };
 
 
   const promotions = dataBcPromos.results.map(item => {

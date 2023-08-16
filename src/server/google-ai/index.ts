@@ -89,7 +89,7 @@ export async function recommendPromotion(
     The promotion needs an action and notifications. The action can be one of the following: [{"action":"cart_value","action_name":"Cart Value","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"cart_items","action_name":"Cart Items","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"gift_item","action_name":"Gift Item","discount":{"gift_item":{"quantity":"integer","product_id":"integer","variant_id":"integer"}}},{"action":"shipping","action_name":"Shipping","discount":{"shipping":{"free_shipping":"boolean"}}}]
     The recommendation goals & offers can following the guidelines from here: [{"segmentName":"Top Customers","goal":"Reduce friction and maintain margins","possible_promotions":["Free Shipping","Free Shipping on Orders Over $50","10% Off All Orders"]},{"segmentName":"Dormant Customers","goal":"Re-engage the shopper with strong offer","possible_promotions":["20% Off All Purchases Site Wide","Free gift with purchase"]},{"segmentName":"Loyal Customers","goal":"Increase loyalty and average order value","possible_promotions":["Free Gift on Orders Over $200","Free Shipping on All Orders","10% Off All Orders"]},{"segmentName":"High Potentials","goal":"Expand product catalog exposure","possible_promotions":["25% Off Purchase of Items from New Collection","10% Off All Orders"]},{"segmentName":"Small Buyers","goal":"Increase lifetime value","possible_promotions":["10% Off Next Purchase","Free Item with Purchase"]}]
     This is for a store on the BigCommerce platform. 
-    DO NOT tell the user how to do this inside the BigCommerce platform dashboard.
+    DO NOT tell the user how to do this inside the BigCommerce platform dashboard or give steps to create the promotion.
     This conversation started with user being asked the question "Would you like to add a promotion per the details below?" This conversation should have some back and forth before you can provide the final message unless the user provides all the deatils.
     ${input}`;
   
@@ -180,6 +180,16 @@ export async function recommendPromotion(
         "input": {
             "author": "user",
             "content": "Give the me details"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure, here you go.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage_amount\',\'value_example\':\'10.0\'}]}```"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Yes, I would like to create this promotion"
         },
         "output": {
             "author": "bot",

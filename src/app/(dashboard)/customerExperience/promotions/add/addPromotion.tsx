@@ -69,11 +69,13 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
             <Text>
               Let's create your promotion.
             </Text>
-            <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} />
+            <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} token={token} storeHash={storeHash} />
           </Panel>
       </>
     )
   }
+
+
 
   // const handleGeneratePromotion = async (chat, newMessage) => {
   //   console.log('handleGeneratePromotion')

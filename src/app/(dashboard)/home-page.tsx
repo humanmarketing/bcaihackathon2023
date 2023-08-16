@@ -19,7 +19,7 @@ export default function HomePage() {
   const setup = false;
 
   const storeHash = 'vdxg1jkwzi';
-
+  const otherAttributes = {}
 
 
 
@@ -40,7 +40,7 @@ export default function HomePage() {
           <Text>
             Let's get you set up.
           </Text>
-          <ChatPrompt endpoint='/api/onboardingGuidedChat' initialMessage={`Welcome to ${APP_NAME}! It only takes a few minutes to get started. Are you ready?`} />
+          <ChatPrompt endpoint='/api/onboardingGuidedChat' initialMessage={`Welcome to ${APP_NAME}! It only takes a few minutes to get started. Are you ready?`} otherAttributes={otherAttributes} token={''} storeHash={storeHash} />
         </Panel>
       )}
     </Box>

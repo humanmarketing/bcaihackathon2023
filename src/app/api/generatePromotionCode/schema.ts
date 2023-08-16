@@ -41,21 +41,6 @@ export const aiSchema = z.union([
   }),
 ]);
 
-export const aiPromotionAddSchema = z.object({
-    // style: z.string(),
-    // wordCount: z.number(),
-    // optimizedForSeo: z.boolean(),
-    // brandVoice: z.string(),
-    // additionalAttributes: z.string(),
-    // keywords: z.string(),
-    // instructions: z.string(),
-    messages: z.any().optional(),
-    attributes: z.any().optional(),
-    newMessage: z.any().optional(),
-    segmentId: z.string().optional(),
-    segmentName: z.string().optional(),
-  });
-
 export const aiPromotionCodeSchema = z.object({
   code: z.string(),
   otherAttributes: z.any().optional(),

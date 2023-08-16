@@ -6,7 +6,7 @@ import Loader from '~/components/Loader';
 
 const APP_NAME = 'Ecommerce Copilot AI';
 
-export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }) {
+export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, token, storeHash }) {
     const messages = [];
     const bottomRef = useRef<any>(null);
     const [results, setResults] = useState<any>({response: messages});
@@ -27,6 +27,7 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
         }
     };
 
+
     return (
         <>
             <Box
@@ -35,8 +36,8 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
                 paddingHorizontal={{ mobile: 'medium', tablet: 'xLarge' }}
                 style={{ height: '400px', overflowY: 'auto' }}
             >
-                <SystemMessage message={initialMessageObj} action={null} />
-                <PromptMessages messages={chat} initialMessage={initialMessage} />
+                <SystemMessage message={initialMessageObj} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} />
+                <PromptMessages messages={chat} initialMessage={initialMessage} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} />
                 {isPrompting && <SystemMessageLoader />}
                 {!isPrompting && <UserInput newMessage={newMessage} setNewMessage={setNewMessage} /> }
                 <div ref={bottomRef}></div>
@@ -60,11 +61,11 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes }
     )
 }
 
-const PromptMessages = ({ messages, initialMessage }) => {
+const PromptMessages = ({ messages, initialMessage, otherAttributes, token, storeHash }) => {
 
     return messages.map((message) => {
         if (message.author === 'system') {
-            return <SystemMessage message={message} action={null} />;
+            return <SystemMessage message={message} otherAttributes={otherAttributes} token={token} storeHash={storeHash} />;
         } else if (message.author === 'user') {
             return <UserMessage message={message} />;
         } 
@@ -72,7 +73,7 @@ const PromptMessages = ({ messages, initialMessage }) => {
     });
 };
 
-const SystemMessage = ( { message, action }) => {
+const SystemMessage = ( { message, otherAttributes, token, storeHash }) => {
     return (
         <Flex>
             <FlexItem
@@ -101,6 +102,7 @@ const SystemMessage = ( { message, action }) => {
                         >
                             <Button
                                 marginBottom={'none'}
+                                onClick={() => createPromotion(message.codeBlock, otherAttributes, token, storeHash)}
                             >
                                 Create Promotion
                             </Button>
@@ -229,9 +231,9 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
     setIsPrompting(true);
     const currentAttributes = {};
 
-    let newMessageContent = newMessage;
-    const newMessageObj = {"author": "user", "content": newMessageContent};
-    addMessageToChat("user", newMessage);
+    // let newMessageContent = newMessage;
+    const newMessageObj = {"author": "user", "content": newMessage};
+    addMessageToChat("user", newMessage, '');
     setNewMessage('');
 
     let messages: any[] = [...chat, newMessageObj];
@@ -260,8 +262,10 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
     }
 
 
-    setResults({ promptAttributes: currentAttributes, response: content });
+    // setResults({ promptAttributes: currentAttributes, response: content });
     
+    
+
     addMessageToChat("system", content, codeBlock);
     setIsPrompting(false);
 };
@@ -326,6 +330,55 @@ function extractCodeBlocks(inputString: string | null | undefined): CodeBlock {
     isCodeBlock: false,
   };
 
+}
+
+const createPromotion = async (codeBlock, otherAttributes, token, storeHash) => {
+    const res = await fetch('/api/generatePromotionCode', {
+        method: 'POST',
+        body: JSON.stringify({ code: codeBlock.contentBetween, attributes: otherAttributes }),
+      });
+    
+      if (!res.ok) {
+        throw new Error('Cannot generate response, try again later');
+      }
+
+      const results = await res.json();
+      console.log('createPromotion', cleanJsonString(results.code));
+      await createPromotionInBc(cleanJsonString(results.code), token, storeHash);
+
+}
+
+
+
+const createPromotionInBc = async (body, token, storeHash) => {
+    const res = await fetch('/api/createBcPromotions', {
+      method: 'POST',
+      body: JSON.stringify(
+        {
+            body: body,
+            token: token,
+            storeHash: storeHash
+        }
+      ),
+    });
+
+    if (!res.ok) {
+      throw new Error('Cannot create promotion, try again later');
+    }
+}
+
+function cleanJsonString(s) {
+    // Find content between the outermost curly braces
+    const match = s.match(/{[\s\S]*}/);
+    
+    if (match) {
+        const cleanedStr = match[0];
+        
+        // Parse the cleaned string into a JSON object
+        return JSON.parse(cleanedStr);
+    } else {
+        throw new Error("No valid JSON detected in the provided string.");
+    }
 }
 
 const AIBox = styled(Box)`

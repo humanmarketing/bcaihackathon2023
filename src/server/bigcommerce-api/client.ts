@@ -67,6 +67,22 @@ const fetchFromBigCommerceApi = (
     },
   });
 
+const postToBigCommerceApi = (
+    path: string,
+    accessToken: string,
+    storeHash: string,
+    body: any
+  ) =>
+    fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}/v3${path}`, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-auth-token': accessToken,
+      },
+      body: JSON.stringify(body),
+    });
+
 export async function fetchProduct(
   productId: number,
   accessToken: string,
@@ -200,6 +216,34 @@ export async function fetchPromotions(
 
   if (!response.ok) {
     throw new Error('Failed to fetch promotions');
+  }
+
+  const parsedPromotions = promotionSchema.safeParse(await response.json());
+
+  if (!parsedPromotions.success) {
+    throw new Error('Failed to parse promotions');
+  }
+
+  return parsedPromotions.data.data;
+}
+
+export async function createPromotion(
+  body: any,
+  accessToken: string,
+  storeHash: string
+) {
+
+  console.log('createPromotion', body, accessToken, storeHash)
+  const response = await postToBigCommerceApi(
+    `/promotions`,
+    accessToken,
+    storeHash,
+    body
+  );
+
+  if (!response.ok) {
+    console.log(response);
+    throw new Error('Failed to create promotion');
   }
 
   const parsedPromotions = promotionSchema.safeParse(await response.json());

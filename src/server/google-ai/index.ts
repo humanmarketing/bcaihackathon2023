@@ -1,11 +1,11 @@
 import { type z } from 'zod';
 import { env } from '~/env.mjs';
 import { GoogleAuth } from 'google-auth-library';
-import { DiscussServiceClient, TextServiceClient } from '@google-ai/generativelanguage';
+import { DiscussServiceClient, ModelServiceClient, TextServiceClient } from '@google-ai/generativelanguage';
 
 import { DEFAULT_GUIDED_ATTRIBUTES, STYLE_OPTIONS } from '~/constants';
 import { type aiSchema } from '~/app/api/generateDescription/schema';
-import { type aiPromotionAddSchema } from '~/app/api/generatePromotion/schema';
+import { type aiPromotionAddSchema, aiPromotionCodeSchema } from '~/app/api/generatePromotion/schema';
 
 const MODEL_NAME = 'models/text-bison-001';
 const API_KEY = env.GOOGLE_API_KEY;
@@ -194,18 +194,9 @@ export async function recommendPromotion(
     console.log('chat response', response);
 
     if (response && response[0] && response[0].candidates) {
-      // checkForAction(response[0].candidates[0]?.content);
-
-      
-      // TODO: modify the types to allow
-      // response[0].codeBlocks = codeBlocks;
-
       return response[0].candidates[0]?.content ? response[0] : 'No response from Google AI';
     }
 
-    // if (response && response[0] && response[0].candidates) {
-    //   return response[0].candidates[0]?.output || 'No response from Google AI';
-    // }
   } catch (error) {
     console.error(error);
   }
@@ -327,6 +318,38 @@ export async function onboardStoreAccount(
   return 'No response from Google AI';
 }
 
+export async function generatePromotionCode(
+  attributes: z.infer<typeof aiPromotionCodeSchema>
+): Promise<string> {
+  const input = attributes.code;
+
+  const prompt = `${createPromotionAPIInstructions} 
+    Details: ${input} 
+    Documentation: ${createPromotionAPIDocumentation}
+    Example: ${createPromotionAPIExample}`;
+
+  try {
+    const client = new TextServiceClient({
+      authClient: new GoogleAuth().fromAPIKey(API_KEY),
+    });
+
+    const response = await client.generateText({
+      model: 'models/text-bison-001',
+      temperature: 0.2,
+      prompt: { text: prompt }
+    });
+
+    if (response && response[0] && response[0].candidates) {
+      console.log(response);
+      return response[0].candidates[0]?.output || 'No response from Google AI';
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return 'No response from Google AI';
+}
+
 const prepareInput = (attributes: z.infer<typeof aiSchema>): string => {
   if ('customPrompt' in attributes) {
     return `Instruction: ${attributes.customPrompt}`;
@@ -357,6 +380,13 @@ const preparePromotionAddInput = (attributes: z.infer<typeof aiPromotionAddSchem
         Customer segment ID: [${attributes?.segmentId}]`;
 };
 
+const preparePromotionCodeInput = (attributes: z.infer<typeof aiPromotionCodeSchema>): string => {
+  return `Details for promotion:
+      Details: [${attributes?.code}]
+      Customer segment: [${attributes?.otherAttributes.segmentName}]
+      Customer segment ID: [${attributes?.otherAttributes.segmentId}]`;
+};
+
 const prepareProductAttributes = (
   attributes: z.infer<typeof aiSchema>
 ): string => {
@@ -381,3 +411,245 @@ const prepareProductAttributes = (
         "name": ${attributes.product?.name || ''} `;
   }
 };
+
+
+const createPromotionAPIInstructions = `Task: construct the JSON request body for the CreatePromotion API as per the documentation below and using the following details.
+    The redemption type should be "AUTOMATIC".
+    Provide the rules, customer segment, and notifications. 
+  `;
+
+const createPromotionAPIDocumentation = `CreatePromotion API
+  Fields:
+  id: integer
+  
+  Auto-generated unique identifier.
+  redemption_type: string (Read-only)
+  
+  Type of promotion.
+  Allowed values: AUTOMATIC, COUPON.
+  name: string (Required)
+  
+  Internal name for the rule.
+  channels: array[object]
+  
+  Targeted promotion channels.
+  Defaults to [] (all channels) if omitted.
+  Object Structure:
+  id: integer (Required)
+  customer: object
+  
+  Eligibility requirements.
+  Only specify "group_ids" or "excluded_group_ids".
+  group_id 0 represents unassigned customers.
+  rules: array[object] (Required)
+  
+  Ordered list of rules.
+  Object Structure:
+  action: object (Required)
+  Can be:
+  Cart Value Action
+  Cart Items Action
+  Fixed Price Set Action
+  Shipping Action
+  condition: object
+  Can be:
+  Cart Condition
+  NotCondition
+  cart_value: object
+  
+  apply_once: boolean
+  stop: boolean
+  cart: object
+  
+  items: object
+  Specifies which items to consider.
+  Requires at least minimum_quantity or minimum_spend if specified.
+  minimum_spend: string
+  minimum_quantity: integer
+  current_uses: integer (Read-only)
+  
+  max_uses: integer
+  
+  status: string
+  
+  Allowed values: ENABLED, DISABLED, INVALID.
+  start_date: string
+  
+  end_date: string
+  
+  stop: boolean
+  
+  can_be_used_with_other_promotions: boolean
+  
+  currency_code: string
+  
+  ISO-4217 currency code or * for all.
+  notifications: array[object]
+  
+  content: string (Required)
+  type: string (Required)
+  Allowed values: UPSELL, ELIGIBLE, APPLIED.
+  locations: array[string] (Required)
+  shipping_address: object
+  
+  Specifies which addresses to consider.
+  countries: array[object] (Required)
+  
+  schedule: object
+  
+  week_frequency: integer (Required)
+  week_days: array[string] (Required)
+  daily_start_time: string (Required)
+  daily_end_time: string (Required)
+  `;
+
+const createPromotionAPIExample = `{
+  "redemption_type": "AUTOMATIC",
+  "name": "Come Back",
+  "channels": [
+      {
+          "id": 1
+      }
+  ],
+  "customer": {
+      "minimum_order_count": 0,
+      "segments": {
+          "id": [
+          "cf04786c-1614-42ca-9afa-997d0acd3d8b"
+          ]
+      }
+  },
+  "rules": [
+  {
+      "action": {
+          "cart_items": {
+              "discount": {
+                  "percentage_amount": "50"
+              },
+              "strategy": "LEAST_EXPENSIVE",
+              "add_free_item": false,
+              "as_total": false,
+              "include_items_considered_by_condition": false,
+              "exclude_items_on_sale": false
+          }
+      },
+      "apply_once": true,
+      "stop": false
+  }
+  ],
+  "max_uses": 10,
+  "status": "ENABLED",
+  "stop": false,
+  "can_be_used_with_other_promotions": false,
+  "currency_code": "USD",
+  "notifications": [
+      {
+      "type": "PROMOTION",
+      "content": "50% off store except sale",
+      "locations": [
+              "HOME_PAGE",
+              "PRODUCT_PAGE",
+              "CART_PAGE"
+          ]
+      },
+      {
+      "type": "UPSELL",
+      "content": "50% off store except sale",
+      "locations": [
+          "HOME_PAGE",
+          "PRODUCT_PAGE",
+          "CART_PAGE"
+      ]
+      },
+      {
+      "type": "ELIGIBLE",
+      "content": "50% off store except sale",
+      "locations": [
+          "CART_PAGE"
+      ]
+      },
+      {
+      "type": "APPLIED",
+      "content": "50% off store except sale",
+      "locations": [
+          "HOME_PAGE",
+          "CART_PAGE"
+      ]
+      }
+  ],
+  "shipping_address": null,
+  "schedule": null,
+  "coupon_overrides_automatic_when_offering_higher_discounts": false
+},        {
+  "name": "Free Ship",
+  "channels": [],
+  "customer": {
+      "group_ids": [],
+      "minimum_order_count": 0,
+      "excluded_group_ids": [],
+      "segments": null
+  },
+  "rules": [
+      {
+          "action": {
+              "shipping": {
+                  "free_shipping": true,
+                  "zone_ids": "*"
+              }
+          },
+          "apply_once": true,
+          "stop": false,
+          "condition": {
+              "cart": {
+                  "minimum_spend": "100"
+              }
+          }
+      }
+  ],
+  "notifications": [
+    {
+    "type": "PROMOTION",
+    "content": "Free shipping",
+    "locations": [
+            "HOME_PAGE",
+            "PRODUCT_PAGE",
+            "CART_PAGE"
+        ]
+    },
+    {
+    "type": "UPSELL",
+    "content": "Free shipping",
+    "locations": [
+        "HOME_PAGE",
+        "PRODUCT_PAGE",
+        "CART_PAGE"
+    ]
+    },
+    {
+    "type": "ELIGIBLE",
+    "content": "Free shipping",
+    "locations": [
+        "CART_PAGE"
+    ]
+    },
+    {
+    "type": "APPLIED",
+    "content": "Free shipping",
+    "locations": [
+        "HOME_PAGE",
+        "CART_PAGE"
+    ]
+    }
+],
+  "stop": false,
+  "currency_code": "USD",
+  "redemption_type": "AUTOMATIC",
+  "shipping_address": null,
+  "current_uses": 0,
+  "max_uses": null,
+  "start_date": "2023-08-12T05:00:00+00:00",
+  "end_date": null,
+  "status": "ENABLED",
+  "schedule": null,
+  "can_be_used_with_other_promotions": true
+}`;

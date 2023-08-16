@@ -3,7 +3,8 @@ import { type Metadata } from 'next/types';
 import Header from '~/components/Header';
 import StyledComponentsRegistry from '~/lib/registry';
 import ThemeProvider from '~/app/theme-provider';
-import { Provider } from '~/context/GlobalContext';
+// import { Provider } from '~/context/GlobalContext';
+
 
 const sourceSans = Source_Sans_3({
   subsets: ['latin'],
@@ -29,10 +30,10 @@ export default function RootLayout({
       <body>
           <StyledComponentsRegistry>
             <ThemeProvider>
-              <Provider value={{ test }}>
+              {/* <Provider value={{ test }}> */}
                 <Header minHeight="100px" />
                 <main className={sourceSans.className}>{children}</main>
-              </Provider>
+              {/* </Provider> */}
             </ThemeProvider>
           </StyledComponentsRegistry>
       </body>

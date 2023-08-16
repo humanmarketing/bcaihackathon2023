@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Table, Text } from '@bigcommerce/big-design';
-import { EditIcon } from '@bigcommerce/big-design-icons';
+import { AddIcon } from '@bigcommerce/big-design-icons';
 import Loader from '~/components/Loader';
 
 
@@ -18,7 +18,7 @@ const Hr = styled(Flex)`
 
 
 
-export default async function ProductPairings() {
+export default function ProductPairings() {
   const [recommendations, setRecommendations] = useState([]);
   const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -33,7 +33,9 @@ export default async function ProductPairings() {
       return {
           id: index + 1,
           pairing: `Product ${item.product_id_a} + Product ${item.product_id_b}`,
-          count: parseInt(item.frequency, 10)  
+          item1: item.product_id_a,
+          item2: item.product_id_b,
+          count: parseInt(item.frequency)  
       };
   });
 
@@ -56,17 +58,12 @@ export default async function ProductPairings() {
                 <Table
                   columns={[
                     { header: 'ID', hash: 'id', render: ({ id }) => id },
-                    { header: 'Product Combinations', hash: 'products', render: ({ pairing }) => pairing },
+                    { header: 'Product Combinations', hash: 'products', render: ({ item1, item2 }) => <Flex alignItems='center'><Text as="span" marginBottom='none'>Product <Text as="span" bold>{item1}</Text></Text> <AddIcon color="primary" size="large" /> <Text as="span">Product <Text as="span" bold>{item2}</Text></Text></Flex> },
                     { header: 'Frequency', hash: 'count', render: ({ count }) => <Text>Purchased together <Text as="span" bold>{count}</Text> times</Text> },
                   ]}
                   keyField='id'
                   items={recommendations}
-                  stickyHeader
-                  // items={[
-                  //   { id: 1, pairing: 'Product A + Product B', count: 1111 },
-                  //   { id: 2, pairing: 'Product A + Product C', count: 999 },
-                  //   { id: 3, pairing: 'Product A + Product D', count: 888 },
-                  // ]}
+                  // stickyHeader
                 />
             </Panel>
           </>

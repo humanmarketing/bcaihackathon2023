@@ -85,7 +85,7 @@ export async function recommendPromotion(
     The steps in the conversation should be: 
     1. Recommend a promotion to target the customer segment. Ask the user to approve the direction.
     2. Then, confirm the details such as promotion type and discount with the user. Ask the user to approve the details.
-    3. Then, upon approved confirmation from the user, include the details of the promotion in the final message as a JSON object. Do not refer to it as "code" or as "JSON". It should be referenced as "details". It should be prefixed with [--CODE--]. The JSON should be wrapped with a triple back tick before and after. 
+    3. Then, upon approved confirmation from the user, include the details of the promotion in the final message as a JSON object wrapped in triple backticks. Do not refer to it as "code" or as "JSON". It should be referenced as "details". The JSON should be wrapped with a triple back tick before and after. 
     The promotion needs an action and notifications. The action can be one of the following: [{"action":"cart_value","action_name":"Cart Value","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"cart_items","action_name":"Cart Items","discounts":[{"discount_type":"fixed_amount","discount_name":"Fixed Discount","value_type":"money","value_example":"10.00"},{"discount_type":"percentage_amount","discount_name":"Percentage Discount","value_type":"percentage","value_example":"20.0"}]},{"action":"gift_item","action_name":"Gift Item","discount":{"gift_item":{"quantity":"integer","product_id":"integer","variant_id":"integer"}}},{"action":"shipping","action_name":"Shipping","discount":{"shipping":{"free_shipping":"boolean"}}}]
     The recommendation goals & offers can following the guidelines from here: [{"segmentName":"Top Customers","goal":"Reduce friction and maintain margins","possible_promotions":["Free Shipping","Free Shipping on Orders Over $50","10% Off All Orders"]},{"segmentName":"Dormant Customers","goal":"Re-engage the shopper with strong offer","possible_promotions":["20% Off All Purchases Site Wide","Free gift with purchase"]},{"segmentName":"Loyal Customers","goal":"Increase loyalty and average order value","possible_promotions":["Free Gift on Orders Over $200","Free Shipping on All Orders","10% Off All Orders"]},{"segmentName":"High Potentials","goal":"Expand product catalog exposure","possible_promotions":["25% Off Purchase of Items from New Collection","10% Off All Orders"]},{"segmentName":"Small Buyers","goal":"Increase lifetime value","possible_promotions":["10% Off Next Purchase","Free Item with Purchase"]}]
     This is for a store on the BigCommerce platform. 
@@ -143,7 +143,7 @@ export async function recommendPromotion(
         },
         "output": {
             "author": "bot",
-            "content": "Great. We will create a promotion for a 20.0% discount on the cart value.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage\',\'value_example\':\'20.0\'}]}```"
+            "content": "Great. A promotion for a 20.0% discount on the cart value sounds good.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage\',\'value_example\':\'20.0\'}]}```"
         }
     },
     {
@@ -174,6 +174,16 @@ export async function recommendPromotion(
         "output": {
             "author": "bot",
             "content": "Sure, let's go with that.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage_amount\',\'value_example\':\'10.0\'}]}```"
+        }
+    },
+    {
+        "input": {
+            "author": "user",
+            "content": "Give the me details"
+        },
+        "output": {
+            "author": "bot",
+            "content": "Sure, here you go.```{\'action\':\'cart_value\',\'action_name\':\'Cart Value\',\'discounts\':[{\'discount_type\':\'percentage_amount\',\'discount_name\':\'Percentage Discount\',\'value_type\':\'percentage_amount\',\'value_example\':\'10.0\'}]}```"
         }
     }
   ]

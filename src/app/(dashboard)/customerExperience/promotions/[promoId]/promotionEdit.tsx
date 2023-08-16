@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text } from '@bigcommerce/big-design';
 import * as db from '~/lib/db';
 import { set } from 'zod';
+import Loader from '~/components/Loader';
 
 interface PromotionProps {
   promoId: string;
@@ -31,7 +32,7 @@ export default function PromotionEdit({ promoId, token, storeHash, config }) {
     }
   }, [dataBcPromos]);
 
-  if ( isLoadingBcPromos) return <Text>Loading</Text>;
+  if ( isLoadingBcPromos) return <Loader minHeight='30px'/>;
   if ( errorBcPromos ) return <Text>Error</Text>;
 
   console.log(promo);

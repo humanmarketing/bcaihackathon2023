@@ -4,9 +4,23 @@ import styled, { keyframes } from 'styled-components';
 import { Text } from '@bigcommerce/big-design';
 import { CheckIcon } from '@bigcommerce/big-design-icons';
 
-export default function AnimatedButton({ text }) {
+import React from 'react';
+
+interface AnimatedButtonProps {
+  text: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+
+export default function AnimatedButton({ text, onClick }: AnimatedButtonProps) {
+
   return (
-    <NewButton><CheckIcon color={'primary'} /> <Text as="span">{text}</Text></NewButton>
+    <NewButton
+    onClick={onClick}
+      >
+        <CheckIcon color={'primary'} /> 
+        <Text as="span">{text}</Text>
+    </NewButton>
   );
 }
 

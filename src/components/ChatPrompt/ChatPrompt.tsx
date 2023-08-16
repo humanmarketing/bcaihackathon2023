@@ -7,11 +7,12 @@ import Loader from '~/components/Loader';
 
 const APP_NAME = 'Ecommerce Copilot AI';
 
-export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, token, storeHash }) {
+export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, token, storeHash, setUpdateState }) {
     const messages = [];
     const bottomRef = useRef<any>(null);
     const [results, setResults] = useState<any>({response: messages});
     const [isPrompting, setIsPrompting] = useState(false);
+    
     const [newMessage, setNewMessage] = useState<string>('');
     const [chat, setChat] = useState<any>(messages);
     const [input, setInput] = useState<string>('');
@@ -24,7 +25,9 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, 
         setChat(prevChat => [...prevChat, latestMessage]);
 
         if (bottomRef.current) {
-            bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+            }, 1000);  
         }
     };
 
@@ -37,8 +40,8 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, 
                 paddingHorizontal={{ mobile: 'medium', tablet: 'xLarge' }}
                 style={{ height: '400px', overflowY: 'auto' }}
             >
-                <SystemMessage message={initialMessageObj} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} />
-                <PromptMessages messages={chat} initialMessage={initialMessage} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} />
+                <SystemMessage message={initialMessageObj} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} setUpdateState={setUpdateState} />
+                <PromptMessages messages={chat} initialMessage={initialMessage} otherAttributes={otherAttributes}  token={token} storeHash={storeHash} setUpdateState={setUpdateState} />
                 {isPrompting && <SystemMessageLoader />}
                 {!isPrompting && <UserInput newMessage={newMessage} setNewMessage={setNewMessage} /> }
                 <div ref={bottomRef}></div>
@@ -62,11 +65,11 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, 
     )
 }
 
-const PromptMessages = ({ messages, initialMessage, otherAttributes, token, storeHash }) => {
+const PromptMessages = ({ messages, initialMessage, otherAttributes, token, storeHash, setUpdateState }) => {
 
     return messages.map((message) => {
         if (message.author === 'system') {
-            return <SystemMessage message={message} otherAttributes={otherAttributes} token={token} storeHash={storeHash} />;
+            return <SystemMessage message={message} otherAttributes={otherAttributes} token={token} storeHash={storeHash} setUpdateState={setUpdateState} />;
         } else if (message.author === 'user') {
             return <UserMessage message={message} />;
         } 
@@ -74,7 +77,7 @@ const PromptMessages = ({ messages, initialMessage, otherAttributes, token, stor
     });
 };
 
-const SystemMessage = ( { message, otherAttributes, token, storeHash }) => {
+const SystemMessage = ( { message, otherAttributes, token, storeHash, setUpdateState }) => {
     return (
         <Flex>
             <FlexItem
@@ -102,7 +105,7 @@ const SystemMessage = ( { message, otherAttributes, token, storeHash }) => {
                             justifyContent={'flex-end'}
                         >
                             <AnimatedButton
-                                onClick={() => createPromotion(message.codeBlock, otherAttributes, token, storeHash)}
+                                onClick={() => createPromotion(message.codeBlock, otherAttributes, token, storeHash, setUpdateState)}
                                 text='Create Promotion'
                             />
                         </Flex>
@@ -212,12 +215,12 @@ const UserInput = ( { newMessage, setNewMessage }) => {
                 flexGrow={1}
             >
                 <AITextArea
-                key="promoInput"
-                rows={3}
-                placeholder="Respond here"
-                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                    setNewMessage(event.target.value) }
-                value={newMessage}
+                    key="promoInput"
+                    rows={3}
+                    placeholder="Respond here"
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                        setNewMessage(event.target.value) }
+                    value={newMessage}
                 />
             </FlexItem>
             </Flex>
@@ -234,6 +237,7 @@ const handleChatMessage = async (endpoint, chat, newMessage, setNewMessage, init
     const newMessageObj = {"author": "user", "content": newMessage};
     addMessageToChat("user", newMessage, '');
     setNewMessage('');
+    
 
     let messages: any[] = [...chat, newMessageObj];
 
@@ -313,9 +317,11 @@ function extractCodeBlocks(inputString: string | null | undefined): CodeBlock {
     if (firstMatch && lastMatchIndex >= lastMatch.length + 6) {
         firstMatchIndex = inputString.indexOf(firstMatch, lastMatchIndex - lastMatch.length - 6);
     }
+
+    const contentBeforeStr = firstMatchIndex >= 0 ? inputString.slice(0, firstMatchIndex - 3) : inputString;
   
     return {
-      contentBefore: firstMatchIndex >= 0 ? inputString.slice(0, firstMatchIndex - 3) : inputString, // Excluding the three backticks
+      contentBefore: contentBeforeStr.replace(/JSON/g, "details"),
       contentBetween: matches.join('\n```'),
       contentAfter: lastMatchIndex < inputString.length ? inputString.slice(lastMatchIndex + 3) : '', // Excluding the three backticks
       isCodeBlock: true,
@@ -331,7 +337,7 @@ function extractCodeBlocks(inputString: string | null | undefined): CodeBlock {
 
 }
 
-const createPromotion = async (codeBlock, otherAttributes, token, storeHash) => {
+const createPromotion = async (codeBlock, otherAttributes, token, storeHash, setUpdateState) => {
     const res = await fetch('/api/generatePromotionCode', {
         method: 'POST',
         body: JSON.stringify({ code: codeBlock.contentBetween, attributes: otherAttributes }),
@@ -343,8 +349,12 @@ const createPromotion = async (codeBlock, otherAttributes, token, storeHash) => 
 
       const results = await res.json();
       console.log('createPromotion', cleanJsonString(results.code));
-      await createPromotionInBc(cleanJsonString(results.code), token, storeHash);
+      // TODO: uncomment
+    //   await createPromotionInBc(cleanJsonString(results.code), token, storeHash);
 
+      setTimeout(() => {
+          setUpdateState(true);
+        }, 1000);
 }
 
 
@@ -394,5 +404,22 @@ const AIBox = styled(Box)`
 `;
 
 const AITextArea = styled(Textarea)`
-  border-color: red;
+  && {
+    border: 1px solid red;
+  }
+
+  & textarea {
+    animation: fadeIn 2s ease-in-out infinite alternate;
+    color: #999;
+  }
+
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 `;

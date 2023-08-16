@@ -1,6 +1,6 @@
 'use client';
 import {  use, useEffect, useState, type ChangeEvent } from 'react';
-
+import Link from 'next/link'
 import styled from 'styled-components';
 import useSWR from 'swr';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text, Textarea } from '@bigcommerce/big-design';
@@ -20,8 +20,6 @@ interface PromotionProps {
   rules: any;
 }
 
-type InputFieldValue = string | number | boolean | undefined;
-
 
 export default function AddPromotion({ segmentId, segmentName, token, storeHash, config }) {
   const [promo, setPromo] = useState<PromotionProps | null>(null);
@@ -29,21 +27,11 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
   const initialMessage = `Would you like to add a promotion to the ${segmentName} segment?`;
   const [results, setResults] = useState<any>({response: initialMessage});
   const [isPrompting, setIsPrompting] = useState(false);
+  const [isPromoAdded, setIsPromoAdded] = useState(false);
   const [chat, setChat] = useState<any>([]);
   // const [newMessage, setNewMessage] = useState<string>('');
 
 
-  
-  const currentAttributes = {
-    style: 'story',
-    wordCount: 250,
-    includeProductAttributes: true,
-    optimizedForSeo: true,
-    brandVoice: '',
-    additionalAttributes: '',
-    keywords: '',
-    instructions: '',
-  };
 
   const [activeTab, setActiveTab] = useState('tab-1');
 
@@ -54,7 +42,7 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
   console.log(results.response);
   console.log(chat);
 
-  const GuidedPromoCreation = ({ results }) => {
+  const GuidedPromoCreation = ({ results, setIsPromoAdded }) => {
     const [newMessage, setNewMessage] = useState<string>('');
     console.log('newMessage', newMessage)
     const otherAttributes = {
@@ -69,61 +57,11 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
             <Text>
               Let's create your promotion.
             </Text>
-            <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} token={token} storeHash={storeHash} />
+            <ChatPrompt endpoint='/api/recommendPromotion' initialMessage={initialMessage} otherAttributes={otherAttributes} token={token} storeHash={storeHash} setUpdateState={setIsPromoAdded} />
           </Panel>
       </>
     )
   }
-
-
-
-  // const handleGeneratePromotion = async (chat, newMessage) => {
-  //   console.log('handleGeneratePromotion')
-  //   setIsPrompting(true);
-
-  //   let newMessageContent = newMessage;
-  //   if(chat.length === 0) {
-  //     newMessageContent += ` What would you recommend for the ${segmentName} segment?`;
-  //   }
-
-  //   const newMessageObj = {"author": "user", "content": newMessageContent};
-
-  //   let messages: any[] = [...chat, newMessageObj];
-
-  //   const res = await fetch('/api/recommendPromotion', {
-  //     method: 'POST',
-  //     body: JSON.stringify({messages: messages, segmentId: segmentId, segmentName: segmentName}),
-  //   });
-  
-  //   if (!res.ok) {
-  //     setIsPrompting(false);
-  //     throw new Error('Cannot generate promotion, try again later');
-  //   }
-  
-  //   const results = await res.json();
-  //   console.log('results');
-  //   console.log(results)
-
-
-  //   let content = results.response.candidates[0]?.content;
-  //   const codeBlock: CodeBlock = extractCodeBlocks(content);
-
-  //   if (codeBlock.isCodeBlock) {
-  //     content = codeBlock.contentBefore + codeBlock.contentAfter;
-  //   }
-
-  //   setResults({ promptAttributes: currentAttributes, response: content });
-
-  //   addMessageToChat("user", newMessage);
-  //   addMessageToChat("system", content);
-  //   setIsPrompting(false);
-  // };
-
-  // const addMessageToChat = (author, content) => {
-  //   const newMessage = { author, content };
-  //   setChat(prevChat => [...prevChat, newMessage]);
-  // };
-
 
   
 
@@ -135,16 +73,28 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
         <>
           <H1>Add Promotion</H1>
           <Text>Let's configure your promotion offer for segment {segmentName}</Text>
-          <Tabs 
-            activeTab={activeTab}
-            id="cx-tabs"
-            items={tabs}
-            onTabClick={(setActiveTab)}
-          />
-          <Box marginTop="medium">
-            { activeTab === 'tab-1' && <GuidedPromoCreation results={results} /> }
-            { activeTab === 'tab-2' && <PromotionUpsert promoId={null} token={token} storeHash={storeHash} /> }
-          </Box>
+          { isPromoAdded && (
+            <Panel>
+              <Text bold>Success! Your promotion has been added.</Text>
+              <Text>Would you like to add another?</Text>
+              <Button onClick={() => setIsPromoAdded(false)}>Yes</Button>
+              <Button variant='secondary'><ButtonLink href="/customerExperience">No</ButtonLink></Button>
+            </Panel>
+          )}
+          { !isPromoAdded && (
+            <>
+              <Tabs 
+                activeTab={activeTab}
+                id="cx-tabs"
+                items={tabs}
+                onTabClick={(setActiveTab)}
+              />
+              <Box marginTop="medium">
+                { activeTab === 'tab-1' && <GuidedPromoCreation results={results} setIsPromoAdded={setIsPromoAdded} /> }
+                { activeTab === 'tab-2' && <PromotionUpsert promoId={null} token={token} storeHash={storeHash} /> }
+              </Box>
+            </>
+          )}
         </>
         <>
           
@@ -154,7 +104,13 @@ export default function AddPromotion({ segmentId, segmentName, token, storeHash,
   );
 }
 
-
+const ButtonLink = styled(Link)`
+  color: #3C64F4;
+  text-decoration: none;
+  &:hover {
+    background-color: #F0F3FF;
+  }
+`;
 
 const AIBox = styled(Box)`
   min-height: 6rem;

@@ -2,6 +2,7 @@
 import {  useRef, useState, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { Box, Button, Flex, FlexItem, FormGroup, Panel, H1, H2, H3, H4, Input, Select, Stepper, Tabs, Text, Textarea } from '@bigcommerce/big-design';
+import AnimatedButton from '~/components/AnimatedButton/AnimatedButton';
 import Loader from '~/components/Loader';
 
 const APP_NAME = 'Ecommerce Copilot AI';
@@ -51,7 +52,7 @@ export default function ChatPrompt({ endpoint, initialMessage, otherAttributes, 
                     marginTop="xSmall"
                     disabled={isPrompting}
                     mobileWidth="auto"
-                    variant="secondary"
+                    variant="primary"
                     onClick={() => void handleChatMessage(endpoint, chat, newMessage, setNewMessage, initialMessage, otherAttributes, isPrompting, setIsPrompting, setResults, addMessageToChat)}
                 >
                     Send Message
@@ -100,12 +101,10 @@ const SystemMessage = ( { message, otherAttributes, token, storeHash }) => {
                         <Flex
                             justifyContent={'flex-end'}
                         >
-                            <Button
-                                marginBottom={'none'}
+                            <AnimatedButton
                                 onClick={() => createPromotion(message.codeBlock, otherAttributes, token, storeHash)}
-                            >
-                                Create Promotion
-                            </Button>
+                                text='Create Promotion'
+                            />
                         </Flex>
 
                     )}
@@ -381,8 +380,17 @@ function cleanJsonString(s) {
     }
 }
 
+
 const AIBox = styled(Box)`
   min-height: 6rem;
+  opacity: 0; 
+  animation: fadeIn 2s forwards; 
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1; 
+    }
+  }
 `;
 
 const AITextArea = styled(Textarea)`

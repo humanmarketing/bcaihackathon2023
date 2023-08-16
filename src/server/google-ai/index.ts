@@ -229,8 +229,9 @@ export async function onboardStoreAccount(
     3. Would you like to run post-purchase cross-sells based on their interests?
     
     When asking each question, end the response message with a question instead of a statement. Only ask one question at a time.
-    Do not ask any questions that are not related to one of the 3 questions above.
+    Do not ask any questions that are not related to one of the 3 questions above. Do not ask for the website URL.
     The final response should be a welcome to the app.
+    
 
     The user has been asked the following question to initiate the conversation: "Welcome to Ecommerce Copilot AI! It only takes a few minutes to get started. Are you ready?"
     ${input}`;
@@ -279,10 +280,50 @@ export async function onboardStoreAccount(
     },
     {
       "input": {
+        "content": "Let us get started"
+      },
+      "output": {
+        "content": "Sure. It just takes a few minutes to get started.\nThe first question is would you like to grow revenue with existing customers?"
+      }
+    },
+    {
+      "input": {
+        "content": "I am ready"
+      },
+      "output": {
+        "content": "Sure. It just takes a few minutes to get started.\nThe first question is would you like to grow revenue with existing customers?"
+      }
+    },
+    {
+      "input": {
         "content": "Yes, I would you like to run post-purchase cross-sells based on their interests"
       },
       "output": {
         "content": "Great! That's a great way to increase sales. Now that we have all your input, we are going to set up the app accordingly.\n \nWelcome to Ecommerce Copilot AI! "
+      }
+    },
+    {
+      "input": {
+        "content": "Tell me more about the app"
+      },
+      "output": {
+        "content": "Absolutely. Ecommerce Copilot AI bring the power of AI to your store. It offers you insights, efficiency, and impact on your goals. It helps you to grow revenue with existing customers, target guest shoppers & non-logged in customers, and run post-purchase cross-sells based on their interests. \n \nWelcome to Ecommerce Copilot AI! "
+      }
+    },
+    {
+      "input": {
+        "content": "Tell me more about the Ecommerce Copilot AI"
+      },
+      "output": {
+        "content": "Absolutely. Ecommerce Copilot AI bring the power of AI to your store. It offers you insights, efficiency, and impact on your goals. It helps you to grow revenue with existing customers, target guest shoppers & non-logged in customers, and run post-purchase cross-sells based on their interests. \n \nWelcome to Ecommerce Copilot AI! "
+      }
+    },
+    {
+      "input": {
+        "content": "Do you need to know my website URL?"
+      },
+      "output": {
+        "content": "No, right now we just need to know if you would like to grow revenue with existing customers, if we should target guest & non-logged in customers, and if you would like to run post-purchase cross-sells based on their interests"
       }
     }
   ]

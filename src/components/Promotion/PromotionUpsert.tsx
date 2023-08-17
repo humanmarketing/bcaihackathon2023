@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client';
 import {  useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -6,7 +7,11 @@ import { Box, Button, Flex, FlexItem, H1, Input, Select, Stepper, Text } from '@
 interface PromotionProps {
   promoId?: string;
   name: string;
-  rules: any;
+  rules: PromotionRuleProps[];
+}
+
+interface PromotionRuleProps {
+  action: any;
 }
 
 interface PromotionResults {
@@ -52,6 +57,7 @@ export default function PromotionUpsert({ promoId, token, storeHash }: Promotion
         params = new URLSearchParams({ storeHash, token }).toString();
     }
   
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR<PromotionResults>(
       promoId !== null && promoId !== undefined ? `/api/getBcPromotions?${params}` : null, 
       fetcher
@@ -83,21 +89,21 @@ export default function PromotionUpsert({ promoId, token, storeHash }: Promotion
         >
 
             <>
-                <H1>{promo !== null ? `Edit Promo ${promo?.name}` : `Add Promo` } </H1>
+                <H1>{promo !== null ? `Edit Promo ${promo?.name ? promo?.name : ''}` : `Add Promo` } </H1>
 
             <>
             <Stepper currentStep={currentStep} steps={steps} />
 
             {currentStep === 0 && (
                 <>
-                    <Text>Let's configure your promotion offer</Text>
+                    <Text>Let&apso;s configure your promotion offer</Text>
                     <OfferConfiguration rule={promo?.rules[0]} />
                 </>
                 )}
 
             {currentStep === 1 && (
                 <>
-                    <Text>Let's configure your promotion conditions</Text>
+                    <Text>Let&apso;s configure your promotion conditions</Text>
                     <OfferConditions rule={promo?.rules[0]} />
                 </>
             )}

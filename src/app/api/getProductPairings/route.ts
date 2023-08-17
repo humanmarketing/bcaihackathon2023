@@ -1,7 +1,4 @@
-import * as db from '~/lib/db';
 import { type NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { fetchPromotions } from '~/server/bigcommerce-api/client'
 import { env } from '~/env.mjs';
 const HASURA_GRAPHQL_ADMIN_SECRET = env.HASURA_GRAPHQL_ADMIN_SECRET;
 

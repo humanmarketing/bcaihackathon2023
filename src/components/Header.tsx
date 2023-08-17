@@ -1,6 +1,6 @@
 'use client';
 
-import { Flex, FlexItem, Link, Tabs, Text } from '@bigcommerce/big-design';
+import { Flex, FlexItem, Link } from '@bigcommerce/big-design';
 import Image from 'next/image';
 
 export default function Header({ minHeight = '50vh' }) {

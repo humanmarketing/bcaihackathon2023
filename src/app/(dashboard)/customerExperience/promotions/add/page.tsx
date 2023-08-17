@@ -14,6 +14,10 @@ interface PageProps {
   };
 }
 
+interface Config {
+  storeHash: string,
+}
+
 export default async function Page({ searchParams: { segmentId, segmentName } }: PageProps) {
   console.log('segmentId', segmentId);
   const authorized = authorize();
@@ -28,7 +32,7 @@ export default async function Page({ searchParams: { segmentId, segmentName } }:
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  const config = await db.getCxConfig(authorized.storeHash);
+  const config:Config = await db.getCxConfig(authorized.storeHash);
 
 
 

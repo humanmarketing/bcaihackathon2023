@@ -6,6 +6,10 @@ const queryParamSchema = z.object({
     storeHash: z.string(),
   });
 
+interface Config {
+  storeHash: string
+}
+
 export async function GET(req: NextRequest) {
     const parsedParams = queryParamSchema.safeParse(
         Object.fromEntries(req.nextUrl.searchParams)
@@ -14,7 +18,7 @@ export async function GET(req: NextRequest) {
       if (!parsedParams.success) {
         return new NextResponse('Invalid query parameters', { status: 400 });
       }
-    const results = await db.getCxConfig(parsedParams.data.storeHash);
+    const results:Config = await db.getCxConfig(parsedParams.data.storeHash);
     
     return NextResponse.json({ results });
 }

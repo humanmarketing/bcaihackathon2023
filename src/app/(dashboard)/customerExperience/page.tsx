@@ -6,9 +6,7 @@ import CustomerExperienceContent from './customerExperienceContent';
 
 
 interface Config {
-  targetGuestShoppers: boolean,
-  targetPostPurchase: boolean,
-  targetExistingCustomers: boolean,
+  storeHash: string,
 }
 
 export default async function Page() {

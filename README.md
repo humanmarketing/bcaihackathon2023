@@ -1,77 +1,68 @@
-# AI App Foundation
+# Ecommerce Copilot AI
 
-This [single-click app](https://developer.bigcommerce.com/api-docs/apps/guide/types) presents BigCommerce merchants with the ability to generate product descriptions.
+**Developers:** Scott Williams (Chief Innovation Officer at Human Marketing), Sean Larkin (CEO at Fueled.io)
 
-:star2: If you are hacking right now in the Google <> BigCommerce AI Hackathon event, check out our [Hackpack](https://developer.bigcommerce.com/big-ai-hackathon-2023/welcome) for more detail on Vertex AI and BigCommerce App Extensions! :star2:
+## Description
+Ecommerce Copilot AI is a cutting-edge software designed to empower BigCommerce stores. By harnessing store data, converging with marketing best practices, and leveraging AI, our solution offers profound insights, efficiency, and a significant edge in customer experience and revenue growth.
 
-## Install
+## Goals
+- Achieve unparalleled insights.
+- Amplify operational efficiency.
+- Maximize conversion rates, AOV, & LTV for heightened impact.
 
-1. [Use Node 18+ and NPM 8+](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#checking-your-version-of-npm-and-node-js)
-2. Install npm packages
-   - `npm install`
+## Benefits
+- **Deep Insights:** Thoroughly understand your customer, catalog & store data.
+- **Efficiency:** Save precious time and resources.
+- **Engagement:** Actively engage with your customers.
+- **Revenue Growth:** Harness the tools to scale your revenue.
 
-## Usage
+## Features
+- AI-Powered Onboarding.
+- Customers Stats & Insights Extension.
+- Automated Customer Segmentation.
+- AI-Driven Promotion Recommendations & Creation.
+- Segmented Promotions.
+- Customizable Promotion Notifications.
+- In-depth Product Catalog Analysis.
+- Advanced Product Recommendations Engine.
+- Optimized Post-Purchase Experience.
 
-To run the app locally, follow these instructions:
+## Technologies
+- **Ecommerce Platform:** BigCommerce.
+- **APIs:** BigCommerce (encompassing storefront, customers, catalog, customer segmentation, promotions, scripts).
+- **AI & ML:** Fueled.io, BigQuery + BigQuery ML, Vertex AI (PaLM 2 for Text, PaLM 2 for Chat).
+- **Server & Deployment:** Google App Engine.
+- **Database & Backend:** Hasura, Firebase Cloud Firestore.
 
-1. [Add and start ngrok.](https://ngrok.com/download) _Note: use port 3000 to
-   match Next's server._
-   - `ngrok http 3000`
-   - Get the `ngrok_id` from the **Forwarding** row. You will use it in the next step.
-2. [Register a draft app.](https://developer.bigcommerce.com/docs/3ef776e175eda-big-commerce-apps-quick-start#register-the-app)
-   - Enter app callbacks using the following syntax:
-     - Auth Callback URL: `https://{ngrok_id}.ngrok.app/api/app/auth`, for example `https://12345.ngrok.app/api/app/auth`
-     - Load Callback URL: `https://{ngrok_id}.ngrok.app/api/app/load`
-     - Uninstall Callback URL: `https://{ngrok_id}.ngrok.app/api/app/uninstall`
-   - Configure the following OAuth scopes as directed in [Setup:](https://developer.bigcommerce.com/app-extensions/guide#setup)
-3. Copy `.env.example` to `.env`.
-4. [Replace `CLIENT_ID` and `CLIENT_SECRET` in `.env`](https://devtools.bigcommerce.com/my/apps)
-   (from `View Client ID` in the dev portal).
-5. Update `AUTH_REDIRECT` in `.env` with the ngrok `install` callback URL.
-6. Enter a JWT secret in `.env`.
-   - JWT key should be at least 32 random characters (256 bits) for HS256
-7. [Replace FIRE_API_KEY, FIRE_DOMAIN and FIRE_PROJECT_ID in .env](<[https://console.firebase.google.com](https://developer.bigcommerce.com/api-docs/apps/tutorials/build-a-nextjs-sample-app/step-3-integrate#set-up-firebase-database)>)
-8. [Replace GOOGLE_API_KEY= in .env](https://cloud.google.com/docs/authentication/api-keys)
-9. Start your dev environment in a **separate** terminal from `ngrok`. If
-   `ngrok` restarts, update callbacks in steps 2 and 5 with the new ngrok_id.
-   - `npm run dev`
-10. [Install the app and launch.](https://developer.bigcommerce.com/docs/3ef776e175eda-big-commerce-apps-quick-start#install-the-app)
+## To-Do List
+- [ ] Debug and refine user experience.
+- [ ] Train and enhance AI models for more specific tasks.
+- [ ] Enhance extensibility.
+- [ ] Introduce supplementary insights.
+- [ ] Merge with diverse channels for deeper AI-driven marketing strategies.
+- [ ] Embed App Extension for profound product insights.
+- [ ] Integrate GenAI text into promotion notifications.
 
-## Deploy with Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbigcommerce%2Fai-app-foundation&env=CLIENT_ID,CLIENT_SECRET,APP_ORIGIN,AUTH_CALLBACK,JWT_KEY,FIRE_API_KEY,FIRE_DOMAIN,FIRE_PROJECT_ID,GOOGLE_API_KEY&envDescription=Doc%20for%20setting%20up%20ENV%20Variable&envLink=https%3A%2F%2Fdeveloper.bigcommerce.com%2Fapi-docs%2Fapps%2Ftutorials%2Fbuild-a-nextjs-sample-app%2Fstep-3-integrate%23set-up-firebase-database&project-name=ai-app-foundation&repository-name=ai-app-foundation)
+## Future Roadmap
+- AI-Formulated Marketing insights & recommendations.
+- Comprehensive paid media analysis with a spend optimizer.
 
-## Contributing
+---
 
-Please feel free to ask questions or raise issues in GitHub Issues/Discussions.
-
-## Security
-
-To enhance security, include a CSRF token for sensitive actions (e.g., modifying product descriptions) or operations that might generate load or costs (such as AI prompts). This will provide an extra layer of protection and ensure proper authorization.
-
-## Learn more
-
-### The BigCommerce platform
-
-Looking to help the world's leading brands and the next generation of successful merchants take flight? To learn more about developing on top of the BigCommerce platform, take a look at the following resources:
-
-- [BigCommerce Developer Center](https://developer.bigcommerce.com/) - Learn more about BigCommerce platform features, APIs, and SDKs
-- [BigDesign](https://developer.bigcommerce.com/api-docs/apps/guide/ui) - An interactive site for BigCommerce's React Components with live code editing
-- [Building BigCommerce Apps](https://developer.bigcommerce.com/api-docs/apps/guide/intro) - Learn how to build apps for the BigCommerce marketplace
+**Support & Feedback:** For any inquiries, feedback, or support needs, reach out to our dedicated team at [support@ecommercecopilot.ai](mailto:support@ecommercecopilot.ai).
 
 ## License
 
-Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
+---
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
+**Restricted License**
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
-Software.
+All rights reserved. This software and associated documentation files (the "Software"), and the entirety of its content, are proprietary to the developers. Any reproduction, modification, distribution, or any form of dissemination of the Software without the express prior written permission of the developers is strictly prohibited. Unauthorized use of the Software or any of its parts for personal, commercial, or any other purposes is a violation of copyright laws and is subject to legal action.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+You may not use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software without explicit written permission. 
+
+Any questions about the permitted uses of the Software should be sent to [license@ecommercecopilot.ai](mailto:license@ecommercecopilot.ai).
+
+---
+

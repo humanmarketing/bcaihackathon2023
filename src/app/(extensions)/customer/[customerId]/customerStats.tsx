@@ -1,16 +1,11 @@
 'use client';
 
-// import { usePromptAttributes } from '~/context/PromptAttributesContext';
-import { useState } from 'react';
+import Image from 'next/image';
 import { type NewCustomer, type Customer } from 'types';
 import styled from 'styled-components';
 import { Badge, Box, Button, Flex, FlexItem, Panel, H1, H2, H3, H4, Text } from '@bigcommerce/big-design';
 import { OpenInNewIcon } from '@bigcommerce/big-design-icons';
-// import AiResults from '~/components/AiResults/AiResults';
-// import { CustomPromptForm } from '~/components/PromptForm/CustomPromptForm';
-// import { GuidedPromptForm } from '~/components/PromptForm/GuidedPromptForm';
-// import { StyledButton } from '~/components/PromptForm/styled';
-// import { prepareAiPromptAttributes } from '~/utils/utils';
+
 // import Loader from '~/components/Loader';
 
 const Hr = styled(Flex)`
@@ -40,46 +35,6 @@ interface CustomerDetails {
 
 
 export default function Stats({ customer, details }: { customer: Customer | null, details: CustomerDetails }) {
-  // const { results, setResults, handleDescriptionChange } =
-  //   useDescriptionsHistory(customer.id);
-  // const [isPrompting, setIsPrompting] = useState(false);
-  // const [description, setDescription] = useState(
-  //   results.at(0)?.description || ''
-  // );
-
-  // const {
-  //   isFormGuided,
-  //   setIsFormGuided,
-  //   currentAttributes,
-  //   guidedAttributes,
-  //   customAttributes,
-  //   setGuidedAttributes,
-  //   setCustomAttributes,
-  // } = usePromptAttributes();
-
-  // const handleGenerateDescription = async () => {
-  //   setIsPrompting(true);
-  //   const res = await fetch('/api/generateDescription', {
-  //     method: 'POST',
-  //     body: JSON.stringify(
-  //       prepareAiPromptAttributes(currentAttributes, product)
-  //     ),
-  //   });
-
-  //   if (!res.ok) {
-  //     setIsPrompting(false);
-  //     throw new Error('Cannot generate description, try again later');
-  //   }
-
-  //   const { description } = (await res.json()) as { description: string };
-  //   setResults({ promptAttributes: currentAttributes, description });
-  //   setIsPrompting(false);
-  // };
-
-  // const descriptionChangeWrapper = (index: number, description: string) => {
-  //   setDescription(description);
-  //   handleDescriptionChange(index, description);
-  // };
 
   const handleCancelClick = () =>
     window.top?.postMessage(
@@ -104,11 +59,17 @@ export default function Stats({ customer, details }: { customer: Customer | null
   const statBoxStyles = `flexGrow: 1, flexShrink: 1, flexBasis: 0, padding: 'xSmall'`;
 
   return (
-    <Flex flexDirection="column" padding="xSmall" style={{ minHeight: '90vh' }}>
-      <FlexItem>
+    <Flex flexDirection="column" justifyContent='stretch' padding="xSmall">
+      <FlexItem
+        flexGrow={1}
+      >
         {customer ? (
-        <Box marginBottom="large">
-          <>
+        <Flex 
+          marginBottom="large"
+          flexDirection={'column'}
+          justifyContent={'stretch'}  
+          
+        >
             <Flex
               flexDirection="row"
               justifyContent="space-between"
@@ -173,8 +134,7 @@ export default function Stats({ customer, details }: { customer: Customer | null
                 </Flex>
               </FlexItem>
             </Flex>
-          </>
-          <>
+
             <Panel
               header='Customer Stats'
               >
@@ -263,8 +223,27 @@ export default function Stats({ customer, details }: { customer: Customer | null
                   </FlexItem>
                 </Flex>
             </Panel>
-          </>
-        </Box>
+
+          <Flex
+            flexDirection={'column'}
+            justifyContent={'stretch'}
+          >
+            <FlexItem
+              flexGrow={1}
+              alignSelf={'flex-end'}
+              marginTop={'medium'}
+            >
+              <Image
+                src="/images/ecommercecopilotai-logo.png"
+                alt="Example"
+                width={200}
+                height={56}
+                priority={true}
+              />
+            </FlexItem>
+          </Flex>
+
+        </Flex>
         ) : (
         <Box display="inline-flex" marginBottom="large">
           <Text>Customer Not Found</Text>

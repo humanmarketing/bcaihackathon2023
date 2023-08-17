@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client';
 import {  useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -57,7 +56,6 @@ export default function PromotionUpsert({ promoId, token, storeHash }: Promotion
         params = new URLSearchParams({ storeHash, token }).toString();
     }
   
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { data: dataBcPromos, isLoading: isLoadingBcPromos, error: errorBcPromos } = useSWR<PromotionResults>(
       promoId !== null && promoId !== undefined ? `/api/getBcPromotions?${params}` : null, 
       fetcher

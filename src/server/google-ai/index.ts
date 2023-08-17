@@ -275,6 +275,14 @@ export async function onboardStoreAccount(
         }
     },
     {
+      "input": {
+          "content": "Sure, I do want to grow revenue with existing customers"
+      },
+      "output": {
+          "content": "Sounds good. Now, should we also target guest shoppers & non-logged in customers?"
+      }
+   },
+    {
         "input": {
             "content": "No, I would not like to grow revenue with guest shoppers"
         },
